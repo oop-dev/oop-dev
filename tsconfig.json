@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strict": false,  // 关闭严格模式
+    "noImplicitAny": false,  // 允许隐式 any
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ]
+}

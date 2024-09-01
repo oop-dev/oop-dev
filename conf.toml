@@ -1,0 +1,25 @@
+appid='oop_1725122496904'
+env='dev'
+net='http' #http or ws
+fee=0.1 #http or ws
+pay_url='https://localhost:3000/order/pay'
+
+port=3000
+auth=true #关闭登录拦截
+secret='mlkJHY9MTkkbT02NTUz'  #登录，和登录拦截jwt密钥
+blacklist=["/user/login",'/user/captcha',"/system/get"]  #接口白名单,未登录不拦截
+
+
+
+
+[wx]
+appid='wxd94953bdc5fe9988'
+secret = '2c9276a85bfaddcad40dbb4fd057b6fd'
+mchid='1667507635'
+key='c1bace5e4e87cb271fff869f9e9c7537'
+cb='http://dsfsf/cb'
+
+[db]
+dsn='postgres://postgres:root@localhost:5432/mydb' #目前仅支持postgres数据库
+enable = true
+
