@@ -1,11 +1,9 @@
-appid='oop_1725122496904'
-env='dev'
-net='http' #http or ws
-
+appid='oop_1725122496904' #应用唯一id，serverless云开发使用
+env='dev'  #dev live cloud
+net='http' #http,ws,mq
 port=3000
-auth=true #关闭登录拦截
-secret='mlkJHY9MTkkbT02NTUz'  #登录，和登录拦截jwt密钥
+secret='mlkJHY9MTkkbT02NTUz'  #私钥，签名，jwt，加密等地方使用
+auth=true #开启登录拦截和权限校验
 blacklist=["/user/login",'/user/captcha',"/system/get"]  #接口白名单,未登录不拦截
-
 [pg]
 dsn='postgres://postgres:root@localhost:5432/odb'

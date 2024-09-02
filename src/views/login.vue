@@ -37,9 +37,9 @@ const form = reactive({
 async function login() {
   o.token=localStorage.getItem('captcha_token')
   let rsp=await o.login()
+  localStorage.setItem('uid',rsp.user.id)
   localStorage.setItem('user',JSON.stringify(rsp.user))
   localStorage.setItem('token',rsp.token)
-
   to('dash')
 }
 </script>

@@ -1,3 +1,2 @@
-import {run} from "oop-core/oapi.js";
-
+import {run} from "oop-core/oapi";
 run()

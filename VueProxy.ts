@@ -85,14 +85,6 @@ export const post = async (url, data, config = {}) => {
                 'Content-Type': 'application/json',
                 'Authorization':localStorage.getItem('token')
             }});
-        console.log( 'res-----',rsp)
-        /*        if (typeof rsp=='string'){
-                    ElMessage({
-                        message: rsp,
-                        type: 'success',
-                        plain: true,
-                    })
-                }*/
         return rsp.data
 
     }catch (e){
@@ -109,5 +101,4 @@ export const post = async (url, data, config = {}) => {
         })
         throw e.response.data
     }
-
 };

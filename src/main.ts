@@ -1,15 +1,45 @@
 import './assets/main.css'
-
+//@ts-ignore
 import { createApp } from 'vue'
 import App from './App.vue'
-import router, {getRouter} from './router'
-
+import router from './router'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
-// 异步数据获取函数
-async function get(url:string) {
-    const response = await fetch(url, {
+const app = createApp(App);
+init(app)
+app.config.globalProperties.has =has
+app.use(router);
+app.use(ElementPlus);
+app.mount('#app');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function init(app) {
+    const response = await fetch('http://localhost:3000/system/get', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -20,44 +50,18 @@ async function get(url:string) {
     if (!response.ok) {
         throw new Error('Request failed');
     }
-
-    return response.json();
+    let rsp=await response.json()
+    app.config.globalProperties.classMap = rsp.classMap;
+    localStorage.setItem('classMap', JSON.stringify(rsp.classMap));
+    localStorage.setItem('menu', JSON.stringify(rsp.menu));
+    localStorage.setItem('router', JSON.stringify(rsp.router));
+    app.config.globalProperties.conf = {};
 }
-
-// 应用初始化函数
-async function run() {
-    const app = createApp(App);
-
-    try {
-        // 异步获取数据
-        const rsp = await get('http://localhost:3000/system/get');
-
-        // 设置全局属性
-        app.config.globalProperties.classMap = rsp.classMap;
-        localStorage.setItem('classMap', JSON.stringify(rsp.classMap));
-        localStorage.setItem('menu', JSON.stringify(rsp.menu));
-        localStorage.setItem('router', JSON.stringify(rsp.router));
-        app.config.globalProperties.test = 'Hello, World!111';
-        app.config.globalProperties.conf = {};
-        app.config.globalProperties.has = (perm)=>{
-            let user=JSON.parse(localStorage.getItem('user'))
-            let permissions=user?.role.flatMap(r=>r.permission)
-            console.log('permissions',permissions)
-            let has=permissions?.some(p => p.name == perm)
-            console.log('perm',perm,'has',has)
-            return has
-        };
-
-        // 注册插件
-        app.use(await getRouter());
-        app.use(ElementPlus);
-
-        // 挂载应用
-        app.mount('#app');
-    } catch (error) {
-        console.error('Failed to initialize the app:', error);
-    }
+function has(perm) {
+        let user=JSON.parse(localStorage.getItem('user'))
+        let permissions=user?.role.flatMap(r=>r.permission)
+        console.log('permissions',permissions)
+        let has=permissions?.some(p => p.name == perm)
+        console.log('perm',perm,'has',has)
+        return has
 }
-
-// 调用初始化函数
-run();
