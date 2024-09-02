@@ -1,12 +1,6 @@
-import {Base} from "../Base";
-import {classMap} from "../sun";
-import {Orders} from "./Orders";
-// @ts-ignore
-//type number string sel radio check text date date_range
-//tag 中文
-//link 11,1n,n1,nn,前两个默认子指向父亲，后两个显示申明父持有子
-export class System extends Base {
-    // @ts-ignore
+import {Base} from "oop-core/Base";
+import {classMap} from "oop-core/oapi";
+export class System extends Base<System> {
     async get() {
         //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
         console.log('get order')
@@ -25,17 +19,6 @@ export class System extends Base {
         });
         const routers = await Promise.all(importPromises);
         return {classMap:clazz,menu:menu,router:routers}
-    }
-    async routes() {
-        //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
-        console.log('get order')
-        let rsp=[]
-        Object.keys(classMap).forEach(k=>{
-            console.log(k)
-            rsp.push(...[...new Set(getMethodNames(new Orders()))])
-        })
-        console.log(rsp)
-        return rsp
     }
 }
 function getMethodNames(obj) {

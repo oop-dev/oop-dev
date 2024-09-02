@@ -1,10 +1,5 @@
-import {Base, log, Col, Menu} from "../Base";
-//import svgCaptcha from "svg-captcha";
 import {Role} from "./Role";
-import {Orders} from "./Orders";
-import  {App} from "./App";
-import  {Permission} from "./Permission";
-//import base64 from "base-64";
+import {Base,Col} from "../node_modules/oop-core/Base";
 export class User extends Base<User> {
     @Col({tag:'名称',type:'',filter:true,show:'1111'})//1111代表增删改查是否显示
     name=''
@@ -16,11 +11,11 @@ export class User extends Base<User> {
     async gets() {
         //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
         //this.role=new Role().sel("permission")
+        //console.log(conf.appid)
         this.sel("id","name","pwd","role")
         return await super.gets()
     }
     async login({code,token}) {
-        console.log('code,token',code,token)
         if (await sha256(code)!=token)throw '验证码错误'
         //5表联查，等于user,user_role,role,role_permision,permission的sql 5表联查
         this.sel("id","name","pwd","role").role=new Role().sel("id","name","permission")

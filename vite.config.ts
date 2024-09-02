@@ -12,6 +12,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      // @ts-ignore
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   }

@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "start": "bun add&&concurrently 'bun run dev' 'bun run --watch sun.js'"
+    "start": "bun add&&concurrently 'bun run dev' 'bun run --watch index.ts'"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
@@ -21,6 +21,7 @@
     "echarts": "^5.5.1",
     "edgedb": "^1.5.9",
     "element-plus": "^2.8.0",
+    "oop-core": "^1.0.1",
     "pg": "^8.12.0",
     "svg-captcha": "^1.4.0",
     "vue": "^3.4.29",

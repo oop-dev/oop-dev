@@ -1,4 +1,4 @@
-import {Base, log, Col, Menu} from "../Base";
+import {Base,Col,Menu} from "../node_modules/oop-core/Base";
 import  {Permission} from "./Permission";
 
 
