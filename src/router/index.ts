@@ -32,16 +32,18 @@ export async function to(name: string,id:number) {
 }
 
 export function initRouter(){
-    // 等待所有模块导入完成，并将结果合并到 children 数组中
-    let resultArrays =[]
-    while (!localStorage.getItem('router')){}
-    resultArrays =JSON.parse(localStorage.getItem('router')).flat()
-    resultArrays.forEach(x=>{
-        let [clazz,fn]=x.name.split('/')
-        x['component']=() => import(`../views/${clazz}/${fn}.vue`)
+    let pages=import.meta.glob(`../views/**/*.vue`)
+    console.log(pages)
+    Object.entries(pages).forEach(([k,v])=>{
+        if (!['../views/home.vue','../views/login.vue','../views/dash.vue'].includes(k)){
+            children.push({
+                path: convertPathToString(k),
+                name: convertPathToString(k),
+                component: v
+            });
+        }
     })
-    children.push(...resultArrays);
-
+    console.log(list)
     router = createRouter({
         // @ts-ignore
         history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,4 +51,21 @@ export function initRouter(){
         routes: list
     })
     return router
+}
+function convertPathToString(filePath: string, prefixToRemove?: string): string {
+    prefixToRemove='../views/'
+    // 去除文件扩展名
+    const fileNameWithoutExtension = filePath.replace(/\.[^/.]+$/, "");
+
+    // 去除指定的前缀
+    const pathWithoutPrefix = fileNameWithoutExtension.startsWith(prefixToRemove)
+        ? fileNameWithoutExtension.substring(prefixToRemove.length)
+        : fileNameWithoutExtension;
+
+    // 替换路径分隔符为点分隔符
+    const formattedString = pathWithoutPrefix
+        .replace(/\/+|\\+/g, '/')
+        .replace(/^\.+|\.+$/g, ''); // 去除开头和结尾的点
+
+    return formattedString;
 }
