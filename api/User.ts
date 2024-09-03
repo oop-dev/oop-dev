@@ -1,5 +1,8 @@
 import {Role} from "./Role";
 import {Base,Col} from "../node_modules/oop-core/Base";
+import {conf} from "../node_modules/oop-core/conf.js";
+import {sha256,jwtToken} from "../node_modules/oop-core/utils";
+
 export class User extends Base<User> {
     @Col({tag:'名称',type:'',filter:true,show:'1111'})//1111代表增删改查是否显示
     name=''
@@ -12,6 +15,7 @@ export class User extends Base<User> {
         //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
         //this.role=new Role().sel("permission")
         //console.log(conf.appid)
+        console.log('conf-----------',conf)
         this.sel("id","name","pwd","role")
         return await super.gets()
     }
@@ -47,39 +51,4 @@ function generateRandomText(length) {
         text += charset[randomIndex];
     }
     return text;
-}
-
-async function sha256(message) {
-    // 将字符串编码为 Uint8Array
-    const encoder = new TextEncoder();
-    const data = encoder.encode(message);
-
-    // 计算 SHA-256 哈希
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-
-    // 将 ArrayBuffer 转换为十六进制字符串
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-
-    return hashHex;
-}
-
-
-export async function getJwt(token) {
-    return JSON.parse(atob(token))
-}
-export async function jwtToken(obj) {
-    const sign = await sha256(JSON.stringify(obj))
-    let jwt={payload:obj,sign:sign}
-    console.log(base64(JSON.stringify(jwt)))
-    return base64(JSON.stringify(jwt))
-}
-export async function verifyToken(token){
-    if (!token)return false
-    let jwt=JSON.parse(btoa(token))
-    return token==await jwtToken(jwt.payload)
-}
-function base64(input) {
-    // 将输入字符串转换为 Buffer 对象，并编码为 Base64
-    return Buffer.from(input).toString('base64');
 }

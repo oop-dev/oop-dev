@@ -12,7 +12,7 @@ export const post = async (url, data, header?) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('token'),
+                'Authorization': localStorage.getItem('token')||'',
                 ...header // 合并额外的配置
             },
             body: JSON.stringify(data) // 将数据对象转换为 JSON 字符串
