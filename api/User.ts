@@ -15,8 +15,8 @@ export class User extends Base<User> {
         //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
         //this.role=new Role().sel("permission")
         //console.log(conf.appid)
-        console.log('conf-----------',conf)
-        this.sel("id","name","pwd","role")
+        console.log('this-----------',this)
+        //this.sel("id","name")
         return await super.gets()
     }
     async login({code,token}) {

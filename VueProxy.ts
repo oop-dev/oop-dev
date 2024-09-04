@@ -62,6 +62,9 @@ export function New<T>(clazz: new (...args: any[]) => T, id?): Reactive<T> {
     // @ts-ignore
     let proxy = new Proxy(obj, {
         get(target, property, receiver) {
+            if (typeof target[property] === 'function' && property == 'sel'){
+                return Reflect.get(target, property, receiver);
+            }
             // 保留父类方法名称
             let className = target.constructor.name.toLowerCase()
             //get页面调用其他方法，代表跳转其他方法对应页面
@@ -73,22 +76,22 @@ export function New<T>(clazz: new (...args: any[]) => T, id?): Reactive<T> {
                 return () => target.constructor.metadata
             }else if (typeof target[property] === 'function'&&property&&stack.includes('gets.vue')&&(property=='add'||property=='update'||property=='get')){
                 return async (...args) => {
-                    console.log('fsdf',args[0])
                     to(property,args[0])
                 }
                 // @ts-ignore
-            }else if (!target.list&&property == 'list'||property=='gets') {
+            }else if (!target.list&&property=='list'||property=='gets') {
                 // @ts-ignore
-                obj.list=[]
+                target.list=[]
                 // @ts-ignore
                 let {list,...data}=target
                 gets(receiver,className,'gets',data)
+                return
             }else if (typeof target[property] === 'function') {
                 return async (...args) => {
                     // @ts-ignore
-                    target.where=args[0]
+                    target.on=args[0]
                     // @ts-ignore
-                    let {list,on,select,...data}=target
+                    let {list,...data}=target
                     // @ts-ignore
                     let rsp=await post(className + '/' + property, data)
                     //如果是改请求是页面路由，或者增删改查，自动跳转到get页面
@@ -96,11 +99,13 @@ export function New<T>(clazz: new (...args: any[]) => T, id?): Reactive<T> {
                         to('gets')
                     }else if (property=='del'){
                         // @ts-ignore
-                        target.where=''
-                        receiver.where=''
+                        target.on=''
+                        receiver.on=''
                         // @ts-ignore
                         let {list,on,select,...data}=target
                         gets(receiver,className,'gets',data)
+                    }else if (property=='gets'){
+                        receiver.list=rsp
                     }
                     return rsp
                 };
