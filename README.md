@@ -4,115 +4,90 @@ http接口，vo，数据库操作全是面向对象方式操作，打破原有�
 以面向对象的形式更优雅，更高效地去开发全栈，提高10倍生产力
 ## 快速开始
 ```sh
-git clone https://github.com/oop-dev/vue.git
+git clone https://github.com/oop-dev/oop-dev.git
 ```
 
 ## 环境安装  
-### bun安装:目前仅支持bun，为serverless冷启动必须小于50毫秒考虑，后续考虑node.js
+### bun安装:目前仅支持bun，为serverless冷启动必须小于50毫秒和ts考虑，当node支持ts时，考虑node.js，bun是兼容node的
 ```sh
 linux: curl -fsSL https://bun.sh/install | bash
 win: powershell -c "irm bun.sh/install.ps1 | iex"
 ```
 ### 依赖安装
 ```sh
-bun add
+pnpm i  #推荐使用pnpm，npm，cnpm，bun都哦可以安装依赖
+```
+
+### 安装postgre数据库，然后配置conf.toml密码pg的dsn
+```
+[pg]
+dsn='postgres://postgres:root@localhost:5432/odb'
 ```
 
 ## 运行
 ```sh
 bun run start
-结果:前后端项目同时启动，这里没有前后端的概念了，这里只有对象
+结果:前后端项目同时启动，这里没有前后端的概念了，这里只有云对象
 Listening on 3000
 Local:   http://localhost:5173
 ```
-
+## 说明
+```
+1.动态路由，文件夹就是路由，不需要配置
+2.菜单，@menu('权限即可')
+3.项目启动自动迁移api下所有云对象到pg数据库表，和前端增删改查页面
+4.接口，请使用云对象代替接口
+5.vo请使用云对象嵌套形式代替vo
+6.sql,使用odb对象数据库操作代替sql，避免多表嵌套增删改查麻烦
+```
+## 访问 http://localhost:5173
+```sh
+用户名admin
+密码 admin
+```
 ## 实现后端：api目录创建Merchant类，get1是获取数据接口，add1是添加接口
 ```
-import {Base, log, Meta} from "../Base";
-export class Merchant extends Base {
-    metadata: any
-    @Meta({type: 'string', lable: 'id', valid: {rule: '', msg: ''}})
-    id: string
-    @Meta({type: 'string', lable: '名称', require: true, valid: {rule: '', msg: ''}})
-    name: string
-    @Meta({type: 'string', lable: '押金', require: true, valid: {rule: '', msg: ''}})
-    deposit: number
-    async get1() {
-        //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
-       return [{id:'fdsag',name:'asfdf'}]
-    }
-    async add1() {
-        //this是前端传来的参数，也是操作添加方法的对象
-        console.log(this)
-        //模拟数据库，super.add() ，添加成功，super.add是base dao的数据库增删改查接口
-        return '添加成功'
-    }
+import {Base,Col,Menu} from "../node_modules/oop-core/Base";
+@Menu('权限')
+export class Permission extends Base<Permission> {
+    @Col({tag:'名称',type:'',filter:true,show:'1111'})//1111代表增删改查是否显示
+    name=''
+    // @ts-ignore
 }
 ``` 
-## 实现前端去http概念：o.get1或o.list自动调用对象get1方法，o.add自动调用后端o.add
+## 实现前端去http概念：o.gets或o.list自动调用对象gets云方法(http)，其他页面o.add，o.update自动调用云方法(http)
 ```
 <script setup lang="ts">
-import {onMounted} from "vue";
-import {New} from "../../FrontProxy";
-import {Merchant} from "../../api/Merchant";
-//后续会自动根据o对象生成
-const columns = [
-  { label: '商户id', prop: 'id' },
-  { label: '名称', prop: 'name' },
-]
-let o=New(Merchant)
-let list=[]
-onMounted( async ()=>{
-  list=await o.get1()
-})
-
+import {onMounted, ref} from "vue";
+import {Permission} from "../../../api/Permission";
+import {New} from "../../../VueProxy";
+let o=New(Permission)
+o.size=10
+o.page=1
 </script>
 <template>
-  <el-form :model="o" label-width="auto" style="max-width: 600px">
-    <el-form-item label="商家名称">
-      <el-input v-model="o.name" />
-    </el-form-item>
-    <el-form-item label="密码">
-      <el-input v-model="o.pwd" />
-    </el-form-item>
-  </el-form>
+  <view v-for="{col,tag,filter} in o.cols()">
+    <el-input v-if="filter" v-model="o[col]" style="width: 220px" :placeholder="tag" />
+  </view>
+  <el-button @click="o.gets()" type="primary" plain style="margin-left: 10px ">查询</el-button>
+  <el-button @click="exp" type="primary" plain >导出</el-button>
   <el-table  :data="o.list" style="width: 100%">
     <el-table-column fiexd
-                     v-for="column in columns"
-                     :key="column.prop"
-                     :label="column.label"
-                     :prop="column.prop"
-                     :align="column.align || 'left'"
+                     v-for="column in o.cols()"
+                     :label="column.tag"
+                     :prop="column.col"
     />
+    <el-table-column align="right">
+      <template #header>
+        <el-button size="small" @click="o.add()">新增</el-button>
+      </template>
+      <template #default="scope">
+        <el-button size="small"  @click="o.get(scope.row.id)">详情</el-button>
+        <el-button size="small" @click="o.update(scope.row.id)">修改</el-button>
+        <el-button size="small" type="danger" @click="o.del(`id=${scope.row.id}`)">删除</el-button>
+      </template>
+    </el-table-column>    
   </el-table>
-  <el-button @click="o.add1()" type="primary" plain style="margin-left: 10px ">添加</el-button>
+  <el-pagination  @current-change="page=>{o.page=page;o.gets()}" background layout="prev, pager, next" :page-size="10" :total="1000" />
 </template>
 ```
-## 访问前端页面，发现前后显示出了接口数据，点添加接口也提示添加成功，注意观察后端this就是前端传参
-```
-我们用对象操作方式实现了接口，并没有写任何js代码，
-查询接口:o.get1()自动获取了数据
-新增接口:o.add()，自动把表单数据绑定到o对象上，调用了后端o.add()，参数就是this
-```
-
-## oop思想，去除接口概念
-```
-一切参数由用户传递，表单就是对象对象再带方法，是表单自己操作自己，
-而非前端通过http传递给后端，减少对接成本，减少对接错误
-```
-
-
-## 去除vo和去orm概念
-```
-一切都是对象操作，复杂数据是嵌套对象，而不是vo转换，然后falt扁平化成多个dao对象，然后多次操作db
-举例：
-多表添加：一次对象操作，而非vo转换成merchant表，和多个app表，多次操作
-o.add({name:'m1',pwd:'m1',app:[
-{app_name:'app1',ak:'tear1',sk:'tewar1'},
-{app_name:'app2',ak:'tear2',sk:'tewar2'}
-]})
-
-多表查询：不需要merchant表和app表关联查询，merchant包含app，获取商家对象，自动获取下级对象
-o.gets()  o.get()  o的属性就是条件
-```
-## 框架在更新中，时间紧迫，后续继续完善oop面向对象操作数据库的文档
