@@ -45,17 +45,23 @@ Local:   http://localhost:5173
 用户名admin
 密码 admin
 ```
-## 实现后端：api目录创建Merchant类，get1是获取数据接口，add1是添加接口
+## 实现后端：api目录创建Permission类，gets是获取数据接口，super.gets是操作数据库，base默认实现了增删改查，这几个可以不写
+以下该云方法对应：http://3000/permission/gets,前端请使用云对象，云方法而非接口
 ```
 import {Base,Col,Menu} from "../node_modules/oop-core/Base";
 @Menu('权限')
 export class Permission extends Base<Permission> {
     @Col({tag:'名称',type:'',filter:true,show:'1111'})//1111代表增删改查是否显示
     name=''
-    // @ts-ignore
+    // 后端接口
+    async gets() {
+     // super.gets()查询数据库，base默认实现了gets，get，add，update，del，这几个云方法可以不写
+     return await super.gets()
+    }
 }
 ``` 
 ## 实现前端去http概念：o.gets或o.list自动调用对象gets云方法(http)，其他页面o.add，o.update自动调用云方法(http)
+以下o.list或者o.gets云方法调用会对应发起http://3000/permission/gets请求
 ```
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
