@@ -15,13 +15,23 @@ export class User extends Base<User> {
         //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
         //this.role=new Role().sel("permission")
         //console.log(conf.appid)
-        console.log('this-----------',this)
+        console.log('count-----------',await super.query('select count(*)'))
         //this.sel("id","name")
         return await super.gets()
+    }
+    async add() {
+        //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
+        //this.role=new Role().sel("permission")
+        //console.log(conf.appid)
+        console.log('this-----------',this)
+        //this.sel("id","name")
+        this.pwd=await sha256(this.pwd)
+        return await super.add()
     }
     async login({code,token}) {
         if (await sha256(code)!=token)throw '验证码错误'
         //5表联查，等于user,user_role,role,role_permision,permission的sql 5表联查
+        this.pwd=await sha256(this.pwd)
         this.sel("id","name","pwd","role").role=new Role().sel("id","name","permission")
         let user=await super.get()
         if (!user)throw '用户名密码错误'

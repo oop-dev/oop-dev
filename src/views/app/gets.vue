@@ -2,9 +2,10 @@
 import {onMounted, ref} from "vue";
 import {App} from "../../../api/App";
 import {New} from "../../../VueProxy";
-let o=New(App)
-o.size=10
-o.page=1
+//后续会自动根据o对象生成
+let o=New(App)//New(Orders,1) 两种方式，默认获取空对象，传id获取该id的对象，列表是渲染o.list时获取
+//let name=Orders.name.toLowerCase()
+let name='app'
 </script>
 <template>
   <view v-for="{col,tag,filter} in o.cols()">
@@ -29,5 +30,4 @@ o.page=1
       </template>
     </el-table-column>    
   </el-table>
-  <el-pagination  @current-change="page=>{o.page=page;o.gets()}" background layout="prev, pager, next" :page-size="10" :total="1000" />
 </template>

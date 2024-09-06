@@ -1,5 +1,5 @@
 import {Base,Col,Menu} from "../node_modules/oop-core/Base";
-@Menu('订单')
+
 export class Orders extends Base<Orders> {
     @Col({tag:'名称',type:'',filter:true,show:'1111',link:'n1'})//1111代表增删改查是否显示
     name=''

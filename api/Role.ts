@@ -1,8 +1,5 @@
 import {Base,Col,Menu} from "../node_modules/oop-core/Base";
 import  {Permission} from "./Permission";
-
-
-@Menu('角色')
 export class Role extends Base<Role> {
     @Col({tag:'名称',type:'',filter:true,show:'1111'})//1111代表增删改查是否显示
     name=''
@@ -10,7 +7,6 @@ export class Role extends Base<Role> {
     permission:Permission[]|Permission=[]
     // @ts-ignore
     async gets() {
-        this.sel("id","name","permission")
         return await super.gets()
     }
 }

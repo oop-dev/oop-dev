@@ -2,9 +2,10 @@
 import {onMounted, ref} from "vue";
 import {User} from "../../../api/User";
 import {New} from "../../../VueProxy";
-let o=New(User)
-o.size=10
+//后续会自动根据o对象生成
+let o=New(User)//New(Orders,1) 两种方式，默认获取空对象，传id获取该id的对象，列表是渲染o.list时获取
 o.page=1
+o.size=1
 </script>
 <template>
   <view v-for="{col,tag,filter} in o.cols()">
@@ -27,7 +28,7 @@ o.page=1
         <el-button size="small" @click="o.update(scope.row.id)">修改</el-button>
         <el-button size="small" type="danger" @click="o.del(`id=${scope.row.id}`)">删除</el-button>
       </template>
-    </el-table-column>    
+    </el-table-column>
   </el-table>
   <el-pagination  @current-change="page=>{o.page=page;o.gets()}" background layout="prev, pager, next" :page-size="10" :total="1000" />
 </template>

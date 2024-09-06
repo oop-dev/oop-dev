@@ -58,10 +58,13 @@ async function init(app) {
     app.config.globalProperties.conf = {};
 }
 function has(perm) {
+        if (perm=='*'){
+            return true
+        }
         let user=JSON.parse(localStorage.getItem('user'))
         let permissions=user?.role.flatMap(r=>r.permission)
         console.log('permissions',permissions)
-        let has=permissions?.some(p => p.name == perm)
+        let has=permissions?.some(p =>['*',perm].includes(p.name))
         console.log('perm',perm,'has',has)
         return has
 }
