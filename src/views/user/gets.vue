@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {onMounted,reactive, ref} from "vue";
 import {User} from "../../../api/User";
-import {New} from "../../../VueProxy";
-//后续会自动根据o对象生成
-let o=New(User)//New(Orders,1) 两种方式，默认获取空对象，传id获取该id的对象，列表是渲染o.list时获取
+let user=new User()
+let list=user.gets()
+
+
+
+
 o.page=1
 o.size=1
+list()
+
 </script>
 <template>
   <view v-for="{col,tag,filter} in o.cols()">
@@ -30,5 +35,5 @@ o.size=1
       </template>
     </el-table-column>
   </el-table>
-  <el-pagination  @current-change="page=>{o.page=page;o.gets()}" background layout="prev, pager, next" :page-size="10" :total="1000" />
+  <el-pagination  @current-change="page=>{o.page=page; list()}" background layout="prev, pager, next" :page-size="o.size" :total="o.total" />
 </template>

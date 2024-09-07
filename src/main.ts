@@ -39,7 +39,8 @@ app.mount('#app');
 
 
 async function init(app) {
-    const response = await fetch('http://localhost:3000/system/get', {
+    let url=import.meta.env.VITE_BASE_URL
+    const response = await fetch(`${url}/system/get`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

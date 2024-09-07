@@ -11,13 +11,18 @@ export class User extends Base<User> {
     @Col({tag:'角色',sel:[],link:'nn',show:'1111'})//1111代表增删改查是否显示
     role: Role[]|Role=[];
     // @ts-ignore
-    async gets() {
+    async gets({page,size}) {
+        this.on=`offset ${(page-1)*size} limit ${size}`
+        return {list:await super.gets(),total:await User.count()}
+    }
+    async count({page,size}) {
         //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
         //this.role=new Role().sel("permission")
         //console.log(conf.appid)
-        console.log('count-----------',await super.query('select count(*)'))
+        console.log(page,size)
         //this.sel("id","name")
-        return await super.gets()
+        this.on=`offset ${(page-1)*size} limit ${size}`
+        return await this.get()
     }
     async add() {
         //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询

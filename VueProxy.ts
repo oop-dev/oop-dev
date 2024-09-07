@@ -66,7 +66,7 @@ export function New<T>(clazz: new (...args: any[]) => T, id?): Reactive<T> {
                 return Reflect.get(target, property, receiver);
             }
             // 保留父类方法名称
-            let className = target.constructor.name.toLowerCase()
+            let className = target.constructor.name.toLowerCase().replaceAll('_','')
             //get页面调用其他方法，代表跳转其他方法对应页面
             const error = new Error();
             const stack = error.stack || '';
