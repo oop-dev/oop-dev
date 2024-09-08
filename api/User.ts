@@ -2,7 +2,7 @@ import {Role} from "./Role";
 import {Base,Col} from "../node_modules/oop-core/Base";
 import {conf} from "../node_modules/oop-core/conf.js";
 import {sha256,jwtToken} from "../node_modules/oop-core/utils";
-
+import {reactive} from "vue"
 export class User extends Base<User> {
     @Col({tag:'名称',type:'',filter:true,show:'1111'})//1111代表增删改查是否显示
     name=''
@@ -12,7 +12,9 @@ export class User extends Base<User> {
     role: Role[]|Role=[];
     // @ts-ignore
     async gets({page,size}) {
-        this.on=`offset ${(page-1)*size} limit ${size}`
+
+        this.sel('*').wh(1)
+        console.log(this)
         return {list:await super.gets(),total:await User.count()}
     }
     async count({page,size}) {

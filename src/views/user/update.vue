@@ -5,7 +5,9 @@ import {User} from "../../../api/User";
 import FormTable from "@/components/FormTable.vue";
 import FormTableItem from "@/components/FormTableItem.vue";
 import { useRoute } from 'vue-router';
-let o=New(User,useRoute().query.id)
+let o=new User()
+o.id=useRoute().query.id
+o.get()
 import {Role} from "../../../api/Role"
 let role=New(Role)
 
@@ -15,7 +17,7 @@ let selMap={role:role}
   <el-form ref="formRef" :model="o" label-width="auto">
     <view v-for="{ col, tag, sel, radio, check,show } in o.cols()">
       <el-form-item v-if="show?.[0]=='1'"  :label="tag" :key="col">
-      
+
         <el-select v-if="sel&&Array.isArray(o[col])" v-model="o[col]" multiple :placeholder="tag">
           <el-option
               v-for="(item, index) in selMap[col].list"
@@ -23,8 +25,8 @@ let selMap={role:role}
               :label="item.name"
               :value="item.id"
           />
-        </el-select>      
-      
+        </el-select>
+
         <el-select v-else-if="sel&&typeof o[col]=='object'" v-model="o[col]"  :placeholder="tag">
           <el-option
               v-for="(item, index) in selMap[col].list"
@@ -32,8 +34,8 @@ let selMap={role:role}
               :label="item.name"
               :value="item.id"
           />
-        </el-select>      
-      
+        </el-select>
+
         <el-select v-else-if="sel" v-model="o[col]" :placeholder="tag">
           <el-option
               v-for="(item, index) in sel"

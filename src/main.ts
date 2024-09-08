@@ -5,15 +5,29 @@ import App from './App.vue'
 import router from './router'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
-
+import { ElMessage } from 'element-plus'
 const app = createApp(App);
 init(app)
 app.config.globalProperties.has =has
+app.config.errorHandler =(e,instance,info)=>{
+    ElMessage({
+        // @ts-ignore
+        message: e,
+        type: 'error',
+        plain: true,
+    });}
 app.use(router);
 app.use(ElementPlus);
 app.mount('#app');
 
-
+window.addEventListener("unhandledrejection", e => {
+    ElMessage({
+        // @ts-ignore
+        message: e,
+        type: 'error',
+        plain: true,
+    })
+})
 
 
 

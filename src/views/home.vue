@@ -97,7 +97,6 @@ onMounted(async () => {
     }
   ])
   console.log('mmm', subMenus)
-  router.push({name: 'dash'})
 /*  if (localStorage.getItem("uid")) {
     router.push({name: 'dash'})
   } else {
