@@ -21,7 +21,7 @@ o.gets()
     />
     <el-table-column align="right">
       <template #header>
-        <el-button size="small" @click="o.add()">新增</el-button>
+        <el-button size="small" @click="to('addm')">新增</el-button>
       </template>
       <template #default="scope">
         <el-button size="small"  @click="to('get',scope.row.id)">详情</el-button>

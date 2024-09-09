@@ -1,7 +1,6 @@
 import {Role} from "./Role";
 import {Base,Col} from "../node_modules/oop-core/Base";
-import {conf} from "../node_modules/oop-core/conf.js";
-import {sha256,jwtToken} from "../node_modules/oop-core/utils";
+import {conf,jwtToken,sha256} from "../node_modules/oop-core/oapi.js";
 import {reactive} from "vue"
 export class User extends Base<User> {
     @Col({tag:'名称',type:'',filter:true,show:'1111'})//1111代表增删改查是否显示
@@ -12,8 +11,8 @@ export class User extends Base<User> {
     role: Role[]|Role=[];
     // @ts-ignore
     async gets({page,size}) {
-
-        this.sel('*').wh(1)
+        console.log('page,size',page,size)
+        this.sel('*').wh('1=1').page(page,size)
         console.log(this)
         return {list:await super.gets(),total:await User.count()}
     }

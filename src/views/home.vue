@@ -97,11 +97,11 @@ onMounted(async () => {
     }
   ])
   console.log('mmm', subMenus)
-/*  if (localStorage.getItem("uid")) {
+  if (localStorage.getItem("uid")) {
     router.push({name: 'dash'})
   } else {
     router.push({name: 'login'})
-  }*/
+  }
 
   // 执行其他初始化操作
 /*  console.log('permission', localStorage.getItem('permission'))

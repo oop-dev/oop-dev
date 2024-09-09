@@ -9,13 +9,7 @@ import { ElMessage } from 'element-plus'
 const app = createApp(App);
 init(app)
 app.config.globalProperties.has =has
-app.config.errorHandler =(e,instance,info)=>{
-    ElMessage({
-        // @ts-ignore
-        message: e,
-        type: 'error',
-        plain: true,
-    });}
+
 app.use(router);
 app.use(ElementPlus);
 app.mount('#app');
@@ -23,7 +17,7 @@ app.mount('#app');
 window.addEventListener("unhandledrejection", e => {
     ElMessage({
         // @ts-ignore
-        message: e,
+        message: e.reason,
         type: 'error',
         plain: true,
     })
