@@ -1,10 +1,8 @@
-
-    <script setup lang="ts">
-import { New } from "../../../VueProxy";
+<script setup lang="ts">
 import {System} from "../../../api/System";
 import FormTable from "@/components/FormTable.vue";
 import FormTableItem from "@/components/FormTableItem.vue";
-let o=New(System)
+let o=new System()
 
 let selMap={}
 </script>

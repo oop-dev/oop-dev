@@ -1,10 +1,8 @@
-
-    <script setup lang="ts">
-import { New } from "../../../VueProxy";
+<script setup lang="ts">
 import {Orders} from "../../../api/Orders";
 import FormTable from "@/components/FormTable.vue";
 import FormTableItem from "@/components/FormTableItem.vue";
-let o=New(Orders)
+let o=new Orders()
 
 let selMap={}
 </script>

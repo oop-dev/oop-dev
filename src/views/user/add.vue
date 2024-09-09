@@ -1,12 +1,11 @@
-
-    <script setup lang="ts">
-import { New } from "../../../VueProxy";
+<script setup lang="ts">
 import {User} from "../../../api/User";
 import FormTable from "@/components/FormTable.vue";
 import FormTableItem from "@/components/FormTableItem.vue";
-let o=New(User)
+let o=new User()
 import {Role} from "../../../api/Role"
-let role=New(Role)
+let role=new Role()
+role.gets()
 
 let selMap={role:role}
 </script>

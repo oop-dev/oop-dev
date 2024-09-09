@@ -1,10 +1,10 @@
-
-    <script setup lang="ts">import { New } from "../../../VueProxy";
+<script setup lang="ts">
 import {Orders} from "../../../api/Orders";
 import FormTable from "@/components/FormTable.vue";
 import FormTableItem from "@/components/FormTableItem.vue";
 import { useRoute } from 'vue-router';
-let o=New(Orders,useRoute().query.id)
+let o=new Orders()
+o.get(useRoute().query.id)
 
 let selMap={}
 </script>

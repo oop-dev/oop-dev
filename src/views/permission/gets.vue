@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import {to} from "@/router";
 import {Permission} from "../../../api/Permission";
+import {to} from "@/router";
 let o=new Permission()
-o.page=1
-o.size=1
-o.gets()
-
+let size=10
+o.getpage(1,size)
 </script>
 <template>
   <view v-for="{col,tag,filter} in o.cols()">
@@ -28,7 +26,7 @@ o.gets()
         <el-button size="small" @click="to('update',scope.row.id)">修改</el-button>
         <el-button size="small" type="danger" @click="o.del(`id=${scope.row.id}`)">删除</el-button>
       </template>
-    </el-table-column>
+    </el-table-column>    
   </el-table>
-  <el-pagination  @current-change="page=>{o.page=page; o.gets()}" background layout="prev, pager, next" :page-size="o.size" :total="o.total" />
+  <el-pagination  @current-change="page=>{o.getpage(page,size)}" background layout="prev, pager, next" :page-size="size" :total="o.total" />
 </template>

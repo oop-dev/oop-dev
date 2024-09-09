@@ -9,5 +9,6 @@ export class Role extends Base<Role> {
     async gets() {
         return await super.gets()
     }
+
 }
 

@@ -1,12 +1,11 @@
-
-    <script setup lang="ts">
-import { New } from "../../../VueProxy";
+<script setup lang="ts">
 import {Role} from "../../../api/Role";
 import FormTable from "@/components/FormTable.vue";
 import FormTableItem from "@/components/FormTableItem.vue";
-let o=New(Role)
+let o=new Role()
 import {Permission} from "../../../api/Permission"
-let permission=New(Permission)
+let permission=new Permission()
+permission.gets()
 
 let selMap={permission:permission}
 </script>

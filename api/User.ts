@@ -16,15 +16,6 @@ export class User extends Base<User> {
         console.log(this)
         return {list:await super.gets(),total:await User.count()}
     }
-    async count({page,size}) {
-        //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
-        //this.role=new Role().sel("permission")
-        //console.log(conf.appid)
-        console.log(page,size)
-        //this.sel("id","name")
-        this.on=`offset ${(page-1)*size} limit ${size}`
-        return await this.get()
-    }
     async add() {
         //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
         //this.role=new Role().sel("permission")
