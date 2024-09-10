@@ -50,7 +50,3 @@ function getMethodNames(obj) {
         }
     );
 }
-function upper(str) {
-    if (!str) return str;  // 处理空字符串
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}

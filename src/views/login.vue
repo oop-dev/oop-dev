@@ -22,18 +22,11 @@
 </template>
 
 <script setup>
-import {inject, onMounted, reactive, ref} from 'vue';
 import Captcha from "@/components/Captcha.vue";
-import {New} from "../../VueProxy";
 import {User} from "../../api/User";
 import {to} from "@/router/index";
-let o=New(User)
+let o=new User()
 
-const form = reactive({
-  name: '',
-  pwd: '',
-  captcha: '',
-});
 async function login() {
   o.token=localStorage.getItem('captcha_token')
   let rsp=await o.login()

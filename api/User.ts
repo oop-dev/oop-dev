@@ -1,7 +1,6 @@
 import {Role} from "./Role";
 import {Base,Col} from "../node_modules/oop-core/Base";
 import {conf,jwtToken,sha256} from "../node_modules/oop-core/oapi.js";
-import {reactive} from "vue"
 export class User extends Base<User> {
     @Col({tag:'名称',type:'',filter:true,show:'1111'})//1111代表增删改查是否显示
     name=''
@@ -10,18 +9,7 @@ export class User extends Base<User> {
     @Col({tag:'角色',sel:[],link:'nn',show:'1111'})//1111代表增删改查是否显示
     role: Role[]|Role=[];
     // @ts-ignore
-    async gets({page,size}) {
-        console.log('page,size',page,size)
-        this.sel('*').wh('1=1').page(page,size)
-        console.log(this)
-        return {list:await super.gets(),total:await User.count()}
-    }
     async add() {
-        //模拟数据库查询，super.get()，super.get是base dao的数据库增删改查接口，根据this参数自动查询
-        //this.role=new Role().sel("permission")
-        //console.log(conf.appid)
-        console.log('this-----------',this)
-        //this.sel("id","name")
         this.pwd=await sha256(this.pwd)
         return await super.add()
     }
@@ -40,16 +28,6 @@ export class User extends Base<User> {
     }
 }
 
-/*export async function sha256(message:string) {
-    // 创建一个 SHA-256 哈希对象
-    const hash = crypto.createHash('sha256');
-
-    // 更新哈希对象
-    hash.update(message+'jg,re`h5y34~`thst');
-
-    // 计算哈希并以十六进制字符串的形式返回结果
-    return hash.digest('hex');
-}*/
 function generateRandomText(length) {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let text = '';

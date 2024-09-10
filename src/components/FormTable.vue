@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 let prop=defineProps({clazz: '',list:[]})
 let cols=JSON.parse(localStorage.getItem('classMap'))[prop.clazz]
+delete cols['id']
+console.log(cols)
 </script>
 <template>
   <el-table :data="list.filter(x=>!x.delete)" style="width: 100%">

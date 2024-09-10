@@ -23,29 +23,6 @@ window.addEventListener("unhandledrejection", e => {
     })
 })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 async function init(app) {
     let url=import.meta.env.VITE_BASE_URL
     const response = await fetch(`${url}/system/get`, {
