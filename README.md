@@ -34,6 +34,7 @@ bun run start
 
 ## api后端：api目录下所有类是云对象,super是odb操作数据库增删改查，以下是云对象+数据库增删改查示例
 gets，get，add，update，del继承了base可以不用写的，也可以覆盖重写base增删改查
+数据库表：项目启动api目录下所有云对象自动迁移成数据库表，开源登录分配的pg数据库查看
 ```
 import {Base, Col, Menu} from "../node_modules/oop-core/Base";
 export class Permission extends Base<Permission> {
