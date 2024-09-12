@@ -7,7 +7,6 @@ export class System extends Base<System> {
         let clazz={}
         let menu={}
         Object.keys(classMap).forEach(k=>{
-            console.log(k)
             let o=new classMap[k]()
             if (!o.col){return}
             clazz[k]=o.cols()

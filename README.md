@@ -1,7 +1,8 @@
-# 官网文档:http://www.oop-dev.com
-# 简介
-是首个用面型对象形式，云对象+odb对象数据库的全栈开发的web框架,这里没有http,接口,
-sql,vo,三层架构等概念,云对象+odb实现快速开发,提升10倍生产力,以下是快速开始一个不写代码的admin
+# 官网文档:http://www.oop-dev.com/
+# oop-dev简介
+oop-dev是首个用面型对象形式，云对象+odb对象数据库的全栈开发的web框架,这里没有http,接口,
+sql,vo,三层架构等概念,云对象+odb实现快速开发,提升10倍生产力,以下是快速开始，如何不写代码完成一个admin，
+oadmin是代码量最少的admin
 ## 快速开始
 ````bash
 git clone https://github.com/oop-dev/oop-dev.git
