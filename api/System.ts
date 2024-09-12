@@ -15,39 +15,6 @@ export class System extends Base<System> {
             menu[k]=o.constructor.menu
         })
         console.log(clazz)
-
-        const importPromises = Object.keys(classMap).filter(x=>x!='system').map(async (k) => {
-            return getMethodNames(new classMap[k]());
-        });
-        const routers = await Promise.all(importPromises);
-        return {classMap:clazz,menu:menu,router:routers}
+        return {classMap:clazz,menu:menu}
     }
-}
-function getMethodNames(obj) {
-    let clazz = obj.constructor.name.toLowerCase()
-    let asyncMethods = [];
-    let currentObj = obj;
-
-    do {
-        const props = Object.getOwnPropertyNames(currentObj);
-        props.forEach(prop => {
-            const descriptor = Object.getOwnPropertyDescriptor(currentObj, prop);
-            if (descriptor && typeof descriptor.value === 'function' && descriptor.value.constructor.name === 'AsyncFunction') {
-                asyncMethods.push(prop);
-            }
-        });
-        currentObj = Object.getPrototypeOf(currentObj);
-    } while (currentObj && currentObj !== Object.prototype);
-    asyncMethods=[...new Set(asyncMethods)]
-    console.log(asyncMethods)
-    return asyncMethods.map(x => {
-            //x=x=='get'?'':x
-            let name=x?'/'+x:x
-            return {
-                path: `${clazz}/${x}`,
-                name: `${clazz}/${x}`,
-                component: () => import(`../views/${clazz}/${x}.vue`)
-            }
-        }
-    );
 }
