@@ -2,12 +2,18 @@ import {createRouter, createWebHistory, type Router} from 'vue-router'
 import Login from "../views/login.vue";
 import Home from "../views/home.vue";
 import Dash from "../views/dash.vue";
+import Test from "../views/test.vue";
 
 let children=[
     {
         path: 'dash',
         name: 'dash',
         component: Dash
+    },
+    {
+        path: 'test',
+        name: 'test',
+        component: Test
     },
 ]
 let list = [
@@ -32,6 +38,7 @@ export async function to(name: string,id:number) {
 }
 
 export function initRouter(){
+    // @ts-ignore
     let pages=import.meta.glob(`../views/**/*.vue`)
     console.log(pages)
     Object.entries(pages).forEach(([k,v])=>{
@@ -39,6 +46,7 @@ export function initRouter(){
             children.push({
                 path: convertPathToString(k),
                 name: convertPathToString(k),
+                // @ts-ignore
                 component: v
             });
         }

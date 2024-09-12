@@ -45,6 +45,12 @@
             </div>
           </el-sub-menu>
         </div>
+        <el-menu-item index="test">
+          <el-icon>
+            <setting/>
+          </el-icon>
+          <span>云对象测试</span>
+        </el-menu-item>
         <el-menu-item index="login">
           <el-icon>
             <setting/>

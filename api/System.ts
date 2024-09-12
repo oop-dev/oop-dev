@@ -10,6 +10,7 @@ export class System extends Base<System> {
         Object.keys(classMap).forEach(k=>{
             console.log(k)
             let o=new classMap[k]()
+            if (!o.col){return}
             clazz[k]=o.cols()
             menu[k]=o.constructor.menu
         })

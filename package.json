@@ -17,7 +17,7 @@
     "@vueuse/core": "^11.0.3",
     "echarts": "^5.5.1",
     "element-plus": "^2.8.0",
-    "oop-core": "^1.0.83",
+    "oop-core": "^1.0.86",
     "pg": "^8.12.0",
     "toml": "^3.0.0",
     "vue": "^3.4.29",
@@ -35,6 +35,7 @@
     "npm-run-all2": "^6.2.0",
     "typescript": "~5.4.0",
     "vite": "^5.3.1",
+    "vitepress": "^1.3.4",
     "vue-tsc": "^2.0.21"
   }
 }

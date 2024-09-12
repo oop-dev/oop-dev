@@ -2,7 +2,7 @@ env='dev'
 net='http'
 port=3000
 secret='mlkJHY9MTkkbT02NTUz'
-auth=true
+auth=false
 blacklist=["user/login",'user/captcha',"system/get"]
 [pg]
-dsn='postgres://m0r0u93nsuojfsk0:m0r0u93ntefa1kif@oop-dev.com:5432/m0r0u93nyotrskpl'
+dsn='postgres://m0zkppitfmrdojtw:m0zkppittq6anty5@oop-dev.com:5432/m0zkppitrpkay5ps'

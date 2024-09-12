@@ -17,8 +17,7 @@ export class User extends Base<User> {
         if (await sha256(code)!=token)throw '验证码错误'
         //5表联查，等于user,user_role,role,role_permision,permission的sql 5表联查
         this.pwd=await sha256(this.pwd)
-        this.sel("id","name","pwd","role").role=new Role().sel("id","name","permission")
-        let user=await super.get()
+        let user=await super.sel("id", "name", Role.sel('**')).get()
         if (!user)throw '用户名密码错误'
         return {user:user,token:await jwtToken(user)}
     }
@@ -27,6 +26,7 @@ export class User extends Base<User> {
         return {code:data,token:await sha256(data)}
     }
 }
+
 
 function generateRandomText(length) {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

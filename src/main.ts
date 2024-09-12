@@ -24,6 +24,7 @@ window.addEventListener("unhandledrejection", e => {
 })
 
 async function init(app) {
+    //@ts-ignore
     let url=import.meta.env.VITE_BASE_URL
     const response = await fetch(`${url}/system/get`, {
         method: 'POST',
