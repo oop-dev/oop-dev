@@ -1,4 +1,4 @@
-# 官网文档:http://www.oop-dev.com/
+# 官网文档:http://oop-dev.com
 # oop-dev简介
 全球首个面向对象的全栈开发框架,基于vue+bun.js+postgre,云对象，对象数据库，实现的全栈开发，这里没有http,接口, sql,vo,三层架构等概念，
 云对象+odb实现快速开发，解放生产,以下用最少的代码完成一个齐全的管理系统
@@ -26,5 +26,5 @@ dsn='postgres://postgres:root@localhost:5432/odb'
 非mock模拟数据，这是一个完整的全栈项目，api目录是后端，登录conf.toml分配的云数据库，可查看数据库数据
 ````bash
 bun run start
-访问：http://localhost:5173 用户名admin密码admin
+访问：http://localhost:5173/login 用户名admin密码admin
 ````

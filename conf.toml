@@ -1,5 +1,5 @@
 env='dev'
-net='http'
+net='http1'
 port=3000
 secret='mlkJHY9MTkkbT02NTUz'
 auth=false

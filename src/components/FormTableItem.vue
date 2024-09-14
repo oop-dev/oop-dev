@@ -1,8 +1,18 @@
 <script lang="ts" setup>
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 
 let prop=defineProps({clazz: '',obj: {}})
-let cols=JSON.parse(localStorage.getItem('classMap'))[prop.clazz]
+let cols=ref({})
+function upper(str) {
+  if (!str) return str;  // 处理空字符串
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+onMounted(async ()=>{
+  let m=await import(`../../api/${upper(prop.clazz)}`)
+  let o= new m['App']()
+  cols.value=o.cols()
+  console.log('o',o.cols())
+})
 let list=ref([prop.obj])
 </script>
 <template>

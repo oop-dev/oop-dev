@@ -25,6 +25,8 @@ window.addEventListener("unhandledrejection", e => {
 
 async function init(app) {
     //@ts-ignore
+    console.log('api',import.meta.glob(`/api/*.ts`))
+    //@ts-ignore
     let url=import.meta.env.VITE_BASE_URL
     const response = await fetch(`${url}/system/get`, {
         method: 'POST',
@@ -41,7 +43,6 @@ async function init(app) {
     app.config.globalProperties.classMap = rsp.classMap;
     localStorage.setItem('classMap', JSON.stringify(rsp.classMap));
     localStorage.setItem('menu', JSON.stringify(rsp.menu));
-    localStorage.setItem('router', JSON.stringify(rsp.router));
     app.config.globalProperties.conf = {};
 }
 function has(perm) {
