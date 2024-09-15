@@ -4,6 +4,5 @@
     "noImplicitAny": false,  // 允许隐式 any
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
-  },
-  "files": []
+  }
 }

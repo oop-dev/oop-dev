@@ -11,9 +11,6 @@ importers:
       '@element-plus/icons-vue':
         specifier: ^2.3.1
         version: 2.3.1(vue@3.5.0(typescript@5.4.5))
-      '@types/bun':
-        specifier: ^1.1.6
-        version: 1.1.8
       '@vueuse/core':
         specifier: ^11.0.3
         version: 11.0.3(vue@3.5.0(typescript@5.4.5))
@@ -24,8 +21,8 @@ importers:
         specifier: ^2.8.0
         version: 2.8.1(vue@3.5.0(typescript@5.4.5))
       oop-core:
-        specifier: ^1.0.88
-        version: 1.0.88(@types/node@20.16.3)(typescript@5.4.5)
+        specifier: ^1.0.89
+        version: 1.0.89(@types/node@20.16.3)(typescript@5.4.5)
       pg:
         specifier: ^8.12.0
         version: 8.12.0
@@ -487,9 +484,6 @@ packages:
   '@tsconfig/node20@20.1.4':
     resolution: {integrity: sha512-sqgsT69YFeLWf5NtJ4Xq/xAF8p4ZQHlmGW74Nu2tD4+g5fAsposc4ZfaaPixVu4y01BEiDCWLRDCvDM5JOsRxg==}
 
-  '@types/bun@1.1.8':
-    resolution: {integrity: sha512-PIwVFQKPviksiibobyvcWtMvMFMTj91T8dQEh9l1P3Ypr3ZuVn9w7HSr+5mTNrPqD1xpdDLEErzZPU8gqHBu6g==}
-
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
 
@@ -498,9 +492,6 @@ packages:
 
   '@types/lodash@4.17.7':
     resolution: {integrity: sha512-8wTvZawATi/lsmNu10/j2hk1KEP0IvjubqPE3cu1Xz7xfXXt5oCq3SNUz4fMIP4XGF9Ky+Ue2tBA3hcS7LSBlA==}
-
-  '@types/node@20.12.14':
-    resolution: {integrity: sha512-scnD59RpYD91xngrQQLGkE+6UrHUPzeKZWhhjBSa3HSkwjbQc38+q3RoIVEwxQGRw3M+j5hpNAM+lgV3cVormg==}
 
   '@types/node@20.16.3':
     resolution: {integrity: sha512-/wdGiWRkMOm53gAsSyFMXFZHbVg7C6CbkrzHNpaHoYfsUWPg7m6ZRKtvQjgvQ9i8WT540a3ydRlRQbxjY30XxQ==}
@@ -513,9 +504,6 @@ packages:
 
   '@types/web-bluetooth@0.0.20':
     resolution: {integrity: sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==}
-
-  '@types/ws@8.5.12':
-    resolution: {integrity: sha512-3tPRkv1EtkDpzlgyKyI8pGsGZAGPEaXeu0DOj5DI25Ja91bdAYddYHbADRYVrZMRbfW+1l5YwXVDKohDJNQxkQ==}
 
   '@vitejs/plugin-vue-jsx@4.0.1':
     resolution: {integrity: sha512-7mg9HFGnFHMEwCdB6AY83cVK4A6sCqnrjFYF4WIlebYAQVVJ/sC/CiTruVdrRlhrFoeZ8rlMxY9wYpPTIRhhAg==}
@@ -661,9 +649,6 @@ packages:
     resolution: {integrity: sha512-btwCFJVjI4YWDNfau8RhZ+B1Q/VLoUITrm3RlP6y1tYGWIOa+InuYiRGXUBXo8nA1qKmHMyLB/iVQg5TT4eFoA==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
-
-  bun-types@1.1.26:
-    resolution: {integrity: sha512-n7jDe62LsB2+WE8Q8/mT3azkPaatKlj/2MyP6hi3mKvPz9oPpB6JW/Ll6JHtNLudasFFuvfgklYSE+rreGvBjw==}
 
   camelcase@6.3.0:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
@@ -897,8 +882,8 @@ packages:
   obuf@1.1.2:
     resolution: {integrity: sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==}
 
-  oop-core@1.0.88:
-    resolution: {integrity: sha512-y6Zv/GSbyUtAbIT//wpBN7KC0dU3hX5ZqfNpYoyhqPeBMoUczCVrjqkOPq4PpFt0jXQKE936R18g9fn9dZqRlQ==}
+  oop-core@1.0.89:
+    resolution: {integrity: sha512-Q655HNsY2NXStsswFLS0xGyc3EyLTSq5r1UzC5vOuArBIM6+wPi1gtzqfy+E26Ov9Mz2UpTwAJfijep0+1zo3A==}
     peerDependencies:
       typescript: ^5.0.0
 
@@ -1106,9 +1091,6 @@ packages:
     resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==}
     engines: {node: '>=14.17'}
     hasBin: true
-
-  undici-types@5.26.5:
-    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
@@ -1587,10 +1569,6 @@ snapshots:
 
   '@tsconfig/node20@20.1.4': {}
 
-  '@types/bun@1.1.8':
-    dependencies:
-      bun-types: 1.1.26
-
   '@types/estree@1.0.5': {}
 
   '@types/lodash-es@4.17.12':
@@ -1598,10 +1576,6 @@ snapshots:
       '@types/lodash': 4.17.7
 
   '@types/lodash@4.17.7': {}
-
-  '@types/node@20.12.14':
-    dependencies:
-      undici-types: 5.26.5
 
   '@types/node@20.16.3':
     dependencies:
@@ -1616,10 +1590,6 @@ snapshots:
   '@types/web-bluetooth@0.0.16': {}
 
   '@types/web-bluetooth@0.0.20': {}
-
-  '@types/ws@8.5.12':
-    dependencies:
-      '@types/node': 20.16.3
 
   '@vitejs/plugin-vue-jsx@4.0.1(vite@5.4.3(@types/node@20.16.3))(vue@3.5.0(typescript@5.4.5))':
     dependencies:
@@ -1825,11 +1795,6 @@ snapshots:
       electron-to-chromium: 1.5.13
       node-releases: 2.0.18
       update-browserslist-db: 1.1.0(browserslist@4.23.3)
-
-  bun-types@1.1.26:
-    dependencies:
-      '@types/node': 20.12.14
-      '@types/ws': 8.5.12
 
   camelcase@6.3.0: {}
 
@@ -2051,7 +2016,7 @@ snapshots:
 
   obuf@1.1.2: {}
 
-  oop-core@1.0.88(@types/node@20.16.3)(typescript@5.4.5):
+  oop-core@1.0.89(@types/node@20.16.3)(typescript@5.4.5):
     dependencies:
       pg: 8.12.0
       toml: 3.0.0
@@ -2252,8 +2217,6 @@ snapshots:
   tslib@2.7.0: {}
 
   typescript@5.4.5: {}
-
-  undici-types@5.26.5: {}
 
   undici-types@6.19.8: {}
 

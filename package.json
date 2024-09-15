@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "vite build",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
@@ -13,11 +13,10 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
-    "@types/bun": "^1.1.6",
     "@vueuse/core": "^11.0.3",
     "echarts": "^5.5.1",
     "element-plus": "^2.8.0",
-    "oop-core": "^1.0.88",
+    "oop-core": "^1.0.89",
     "pg": "^8.12.0",
     "toml": "^3.0.0",
     "vue": "^3.4.29",
@@ -25,7 +24,6 @@
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
-    "@types/bun": "latest",
     "@types/node": "^20.14.5",
     "@types/pg": "^8.11.6",
     "@vitejs/plugin-vue": "^5.0.5",
