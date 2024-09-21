@@ -2,21 +2,20 @@
   "name": "vue3",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm-run-all -p frond end",
     "build": "vite build",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "start": "concurrently 'bun run dev' 'bun run --hot index.ts'"
+    "end": "tsx index.ts",
+    "frond": "vite"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
     "@vueuse/core": "^11.0.3",
     "echarts": "^5.5.1",
     "element-plus": "^2.8.0",
-    "oop-core": "^1.0.89",
     "pg": "^8.12.0",
     "toml": "^3.0.0",
     "vue": "^3.4.29",
@@ -29,10 +28,10 @@
     "@vitejs/plugin-vue": "^5.0.5",
     "@vitejs/plugin-vue-jsx": "^4.0.0",
     "@vue/tsconfig": "^0.5.1",
-    "concurrently": "^8.0.0",
-    "npm-run-all2": "^6.2.0",
+    "npm-run-all2": "latest",
     "typescript": "~5.4.0",
     "vite": "^5.3.1",
-    "vue-tsc": "^2.0.21"
+    "vue-tsc": "^2.0.21",
+    "tsx": "^4.19.1"
   }
 }

@@ -1,5 +1,5 @@
-import {Base} from "oop-core/Base";
-import {classMap} from "oop-core/oapi";
+import {Base} from "../oop-core/Base";
+import {classMap} from "../oop-core/oapi";
 export class System extends Base<System> {
 
     async get() {

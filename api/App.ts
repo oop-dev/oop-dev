@@ -1,4 +1,4 @@
-import {Base,Col,Menu} from "../node_modules/oop-core/Base";
+import {Base,Col,Menu} from "../oop-core/Base";
 
 @Menu('应用')
 export class App extends Base<App> {

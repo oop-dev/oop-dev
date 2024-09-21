@@ -1,4 +1,4 @@
-import {run, conf, verifyToken,getJwt, Rsp} from "oop-core/oapi";
+import {run, conf, verifyToken,getJwt, Rsp} from "./oop-core/oapi";
 run(intercepter)
 async function intercepter(r) {
     const path = new URL(r.url).pathname.substring(1);

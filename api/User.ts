@@ -1,6 +1,6 @@
 import {Role} from "./Role";
-import {Base,Col} from "../node_modules/oop-core/Base";
-import {conf,jwtToken,sha256} from "../node_modules/oop-core/oapi.js";
+import {Base,Col} from "../oop-core/Base";
+import {conf,jwtToken,sha256} from "../oop-core/oapi.js";
 export class User extends Base<User> {
     @Col({tag:'名称',type:'',filter:true,show:'1111'})//1111代表增删改查是否显示
     name=''

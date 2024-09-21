@@ -1,4 +1,4 @@
-import {Base,Col,Menu} from "../node_modules/oop-core/Base";
+import {Base,Col,Menu} from "../oop-core/Base";
 import {Merchant} from "./Merchant";
 @Menu("订单")
 export class Order extends Base<Order> {
