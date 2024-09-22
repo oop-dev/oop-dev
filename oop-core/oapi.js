@@ -1,4 +1,5 @@
 import {initdb} from "./Base.ts";
+import {parse} from "path";
 const mimeTypes = {
     'html': 'text/html',
     'css': 'text/css',
@@ -252,7 +253,8 @@ async function node_run(intercepter) {
                 return;
             }
             if (path == '/') {//单页应用只能/访问
-                w.writeHead(200); // 无内容响应
+                w.writeHead(200, {'Content-Type': 'text/html'});
+                // If the file is found, set Content-type and send data
                 w.end(await fs.readFile('dist/index.html'));
                 return;
             }
@@ -260,7 +262,11 @@ async function node_run(intercepter) {
             let split = path.split('.')
             let suffix = split[split.length - 1]
             if (mimeTypes[suffix]) {
-                w.writeHead(200); // 无内容响应
+                //判断mime type静态文件类型
+                const ext = parse(path).ext.replace(`.`,'');
+                console.log('ext',ext)
+                //根据文件后缀类型返回对应格式的文件，如js，还是html，还是图片
+                w.writeHead(200, {'Content-Type': mimeTypes[ext]});
                 w.end(await fs.readFile(`dist` + path));
                 return;
             }
@@ -289,7 +295,7 @@ async function node_run(intercepter) {
         }catch (e) {
             console.log('error:', e.message?e.message:e);
             console.log('stack:', e.stack);
-            w.writeHead(500, {'Content-Type': 'text/plain'});
+            w.writeHead(500, {'Content-Type': 'text/plain;charset=utf-8'});
             w.end(e.message?e.message:e);
         }
     });
