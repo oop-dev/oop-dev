@@ -2,12 +2,14 @@ import './assets/main.css'
 //@ts-ignore
 import { createApp } from 'vue'
 import App from './App.vue'
+//@ts-ignore
 import router from './router'
+//@ts-ignore
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
+//@ts-ignore
 import { ElMessage } from 'element-plus'
 const app = createApp(App);
-init(app)
 app.config.globalProperties.has =has
 
 app.use(router);
@@ -23,28 +25,6 @@ window.addEventListener("unhandledrejection", e => {
     })
 })
 
-async function init(app) {
-    //@ts-ignore
-    console.log('api',import.meta.glob(`/api/*.ts`))
-    //@ts-ignore
-    let url=import.meta.env.VITE_BASE_URL
-    const response = await fetch(`${url}/system/get`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({})
-    });
-
-    if (!response.ok) {
-        throw new Error('Request failed');
-    }
-    let rsp=await response.json()
-    app.config.globalProperties.classMap = rsp.classMap;
-    localStorage.setItem('classMap', JSON.stringify(rsp.classMap));
-    localStorage.setItem('menu', JSON.stringify(rsp.menu));
-    app.config.globalProperties.conf = {};
-}
 function has(perm) {
         if (perm=='*'){
             return true

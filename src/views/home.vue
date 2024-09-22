@@ -70,17 +70,20 @@
 import {useRouter} from "vue-router";
 import {inject, onMounted, ref} from "vue";
 import {to} from "@/router";
-
 const router = useRouter();
 
-
-let get = inject('get')
 let subMenus = ref([])
-let permission = ref([])
 onMounted(async () => {
-  let classMap=JSON.parse(localStorage.getItem('classMap'))
-  let menu=JSON.parse(localStorage.getItem('menu'))
-  console.log('menu',menu)
+  let classMap={}
+  let menu={}
+  //@ts-ignore
+  for (let [k, v] of Object.entries(await import.meta.glob(`/api/*.ts`))) {
+    k=k.replaceAll(`/api/`,'').replaceAll(`.ts`,'')
+    let m=await v()
+    let o= new m[k]()
+    classMap[k.toLowerCase()]=o.cols()
+    menu[k.toLowerCase()]=o.constructor.menu
+  }
   Object.keys(classMap).filter(x => x !== 'system').forEach((x, index) => {
     if (menu[x]){
       subMenus.value.push({
@@ -102,7 +105,6 @@ onMounted(async () => {
       }]
     }
   ])
-  console.log('mmm', subMenus)
   if (localStorage.getItem("uid")) {
     router.push({name: 'dash'})
   } else {

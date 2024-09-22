@@ -8,8 +8,9 @@ function upper(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 onMounted(async ()=>{
+  console.log(111111,prop.clazz)
   let m=await import(`../../api/${upper(prop.clazz)}`)
-  let o= new m['App']()
+  let o= new m[`${upper(prop.clazz)}`]()
   cols.value=o.cols()
   console.log('o',o.cols())
 })
