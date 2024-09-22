@@ -1,5 +1,4 @@
 import {initdb} from "./Base.ts";
-import {parse} from "path";
 const mimeTypes = {
     'html': 'text/html',
     'css': 'text/css',
@@ -263,8 +262,8 @@ async function node_run(intercepter) {
             let suffix = split[split.length - 1]
             if (mimeTypes[suffix]) {
                 //判断mime type静态文件类型
+                let {parse}=await import('path')
                 const ext = parse(path).ext.replace(`.`,'');
-                console.log('ext',ext)
                 //根据文件后缀类型返回对应格式的文件，如js，还是html，还是图片
                 w.writeHead(200, {'Content-Type': mimeTypes[ext]});
                 w.end(await fs.readFile(`dist` + path));
