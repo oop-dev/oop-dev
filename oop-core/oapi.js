@@ -90,6 +90,7 @@ export function createInstance(className, data) {
             //是id直接赋值
             obj[k] =typeof data[k]=='object'?createInstance(k, data[k]):data[k]
         } else if (data?.[k]) {
+            if (typeof obj[k]!=data?.[k])throw `${k} type err`
             //解决sql注入
             if (typeof data?.[k] =="string"){
                 data[k]=data?.[k].replaceAll(`'`,`"`)
@@ -117,6 +118,7 @@ export function createInstanceAndReq(className, json) {
                 //是id直接赋值
                 obj[k] =typeof data[k]=='object'?createInstance(k, data[k]):data[k]
             } else if (data?.[k]) {
+                if (typeof obj[k]!=data?.[k])throw `${k} type err`
                 //解决sql注入
                 if (typeof data?.[k] =="string"){
                     data[k]=data?.[k].replaceAll(`'`,`"`)
@@ -133,6 +135,7 @@ export function createInstanceAndReq(className, json) {
             } else if (json[k] && typeof v == 'object') {
                 obj[k] = createInstance(k, json[k])
             } else if (json?.[k]) {
+                if (typeof obj[k]!=data?.[k])throw `${k} type err`
                 if (typeof json?.[k] =="string"){
                     json[k]=json?.[k].replaceAll(`'`,`"`)
                 }
