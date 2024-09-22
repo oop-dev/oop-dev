@@ -807,7 +807,7 @@ export const post = async (url, data, header) => {
         if (!response.ok) {
             // 如果响应状态不是 2xx，抛出错误
             const errorData = await response.text();
-            if (response.status === 401) {
+            if (errorData=== 'Unauthorized') {
                 // 在 401 错误时重定向到登录页
                 window.location.href = '/login';
             }
