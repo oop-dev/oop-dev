@@ -32,28 +32,7 @@ export class Base<T> {
    static sel(...keys: ((keyof T)|{})[]) {
        let clazz=this.name.toLowerCase()
         let obj=new classMap[clazz]()
-        // 只允许传入当前类的有效属性名
-       keys.forEach(x=>{
-           if (typeof x=="object"){
-               let clazz=x.constructor.name.toLowerCase()
-               obj[clazz]=x
-               obj.select.push(clazz)
-               return
-           }
-           if (x=='**'){
-               Object.keys(obj).filter(k=>!base[k]).forEach(k=>{
-                   if (typeof obj[k]=='object'){
-                       obj[k]=new classMap[clazz]()
-                       obj.select.push(k)
-                   }else {
-                       obj.select.push(k)
-                   }
-               })
-               return
-           }
-           obj.select.push(x)
-       })
-       return obj
+       return obj.sel(...keys)
     }
     sel(...keys: ((keyof T)|{})[]) {
         // 只允许传入当前类的有效属性名
@@ -64,9 +43,34 @@ export class Base<T> {
                 this.select.push(clazz)
                 return
             }
+            if (x=='**'){
+                Object.keys(this).filter(k=>!base[k]).forEach(k=>{
+                    if (typeof this[k]=='object'){
+                        this[k]=new classMap[k]()
+                        this.select.push(k)
+                    }else {
+                        this.select.push(k)
+                    }
+                })
+                return
+            }
             // @ts-ignore
             this.select.push(x)
         })
+        this.gets=async function (where?:string|number){
+            const conn = await pool.connect(); // 从连接池获取一个客户端连接
+            try{
+                let parseMap = {}
+                where=isPureNumber(where)?`id=${where}`:where
+                where=isEmptyObject(where)?'':where
+                return await gets(this, conn, parseMap,where)
+            }catch (e) {
+                throw e
+            }finally {
+                conn.release(); // 释放客户端连接，返回连接池
+            }
+        }
+        Object.defineProperty(this, 'gets', {enumerable: false});
         return this
     }
     wh(where:string|number|undefined):this {
@@ -860,7 +864,6 @@ function isPureNumber(str) {
 }
 export function set(obj, data) {
     if (!data)return
-    console.log('set',data)
     Object.entries(data).forEach(([k, v]) => {
         if (data?.[k] && Array.isArray(v)) {//可能是对象数组，可能是普通数组
             obj[k] = data?.[k].map(v => typeof v == 'object' ? createInstance(k, v) : v)
@@ -868,7 +871,6 @@ export function set(obj, data) {
             //是id直接赋值
             obj[k] =typeof data[k]=='object'?createInstance(k, data[k]):data[k]
         } else if (data?.[k]) {
-            console.log(k,v)
             obj.name=data
         }
     })
