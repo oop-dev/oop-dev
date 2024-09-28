@@ -18,7 +18,8 @@ export class Base<T> {
     list:T[]
     select: string[]=[]
     where: string | undefined =''
-    constructor() {
+    constructor(opts?:(Partial<Record<keyof T, any>>|number)) {
+        if (typeof opts=="number")this.id=opts
         if (typeof window !== 'undefined') {
             let obj=reactive(this)
             wrapMethods(obj)
@@ -26,6 +27,7 @@ export class Base<T> {
             return obj
         }
     }
+
     // @ts-ignore
    static sel(...keys: ((keyof T)|{})[]) {
        let clazz=this.name.toLowerCase()
@@ -340,6 +342,18 @@ export class Base<T> {
         return this.constructor.metadata[k]
     }
 }
+export function Constructor(target) {
+    return new Proxy(target, {
+        construct(target, args) {
+            if (typeof args[0]=="number"){
+                let obj=new target()
+                obj.id=args[0]
+                return obj
+            }
+            return Object.assign(new target(),args[0]);
+        }
+    });
+}
 export function Col(options) {
     return function (target, propertyKey) {
         // 确保每个类都有独立的 metadata
@@ -617,6 +631,14 @@ function getobjSql(u, parseMap) {
 }
 
 async function add(pname, pid, u, conn) {
+    if (u.id){
+        update(pname, pid, u,conn)
+        return
+    }
+    if (u.delete){
+        del(u,conn)
+        return
+    }
     //1.执行自己，2.向下递归对象或者对象数组
     let clazz = u.constructor.name.toLowerCase()
     let sub = []
@@ -666,6 +688,14 @@ async function add(pname, pid, u, conn) {
 
 async function update(pname, pid, u,conn,where?) {
     if (typeof u!='object')return
+    if (!u.id){
+        add(pname, pid, u,conn)
+        return
+    }
+    if (u.delete){
+        del(u,conn)
+        return
+    }
     let clazz = u.constructor.name.toLowerCase()
     let sub = []
     if (pid) u[pname] = pid
@@ -710,7 +740,7 @@ function getwhere(u) {//where和on都支持
     return where
 }
 
-async function del(u,conn,where) {
+async function del(u,conn,where?) {
     let clazz = u.constructor.name.toLowerCase()
     where=where|| Object.entries(u).filter(([key, value]) =>!base[key]&&value && typeof value!='object').map(([k, v]) => {
         if (typeof v != 'object') {
@@ -827,4 +857,20 @@ function isPureNumber(str) {
         return true
     }
     return /^\d+$/.test(str);
+}
+export function set(obj, data) {
+    if (!data)return
+    console.log('set',data)
+    Object.entries(data).forEach(([k, v]) => {
+        if (data?.[k] && Array.isArray(v)) {//可能是对象数组，可能是普通数组
+            obj[k] = data?.[k].map(v => typeof v == 'object' ? createInstance(k, v) : v)
+        } else if (data?.[k] && typeof v == 'object') {
+            //是id直接赋值
+            obj[k] =typeof data[k]=='object'?createInstance(k, data[k]):data[k]
+        } else if (data?.[k]) {
+            console.log(k,v)
+            obj.name=data
+        }
+    })
+    return obj;
 }
