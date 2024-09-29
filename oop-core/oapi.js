@@ -50,14 +50,11 @@ export async function run(intercepter) {
     await loadClass()
     //migrate page and table
     migrate(classMap)
-
-    asyncLocalStorage.run({rid:UUID()}, async () => {
-        if (conf.runtime=='bun'){
-            bun_run(intercepter)
-        }else {
-            node_run()
-        }
-    })
+    if (conf.runtime=='bun'){
+        bun_run(intercepter)
+    }else {
+        node_run()
+    }
 }
 
 export function Rsp(code, data, rid='') {
@@ -207,7 +204,8 @@ async function bun_run(intercepter) {
     Bun.serve({
         port: conf.port,
         async fetch(r) {
-            let rid = Date.now()
+            asyncLocalStorage.run({rid:UUID()}, async () => {
+            let rid = ctx.getStore().rid
             try {
                 //data.rid=rid 设置到meta里面
                 const path = new URL(r.url).pathname;
@@ -249,6 +247,7 @@ async function bun_run(intercepter) {
                 console.error('stack:', e.stack);
                 return Rsp(500, msg, rid)
             }
+            })
         }
     });
     console.log(`Listening on ${conf.port}`);
@@ -258,67 +257,71 @@ async function node_run(intercepter) {
     let url = require('url')
     let querystring = require('querystring')
     const server = http.createServer(async (r, w) => {
-        try {
-            w.setHeader('Access-Control-Allow-Origin', '*');
-            w.setHeader('Access-Control-Allow-Methods', '*');
-            w.setHeader('Access-Control-Allow-Headers', '*');
-            if (r.method=="OPTIONS"){
-                w.writeHead(204); // 无内容响应
-                w.end();
-                return;
+        asyncLocalStorage.run({rid:UUID()}, async () => {
+            try {
+                w.setHeader('Access-Control-Allow-Origin', '*');
+                w.setHeader('Access-Control-Allow-Methods', '*');
+                w.setHeader('Access-Control-Allow-Headers', '*');
+                if (r.method == "OPTIONS") {
+                    w.writeHead(204); // 无内容响应
+                    w.end();
+                    return;
+                }
+                let path = url.parse(r.url).pathname
+                if (path == "/favicon.ico") {
+                    w.writeHead(200); // 无内容响应
+                    w.end(await fs.readFile('dist/favicon.ico'));
+                    return;
+                }
+                if (path == '/') {//单页应用只能/访问
+                    w.writeHead(200, {'Content-Type': 'text/html'});
+                    // If the file is found, set Content-type and send data
+                    w.end(await fs.readFile('dist/index.html'));
+                    return;
+                }
+                //@ts-ignore 判断mime文件类型代表是静态资源，
+                let split = path.split('.')
+                let suffix = split[split.length - 1]
+                if (mimeTypes[suffix]) {
+                    //判断mime type静态文件类型
+                    let {parse} = await import('path')
+                    const ext = parse(path).ext.replace(`.`, '');
+                    //根据文件后缀类型返回对应格式的文件，如js，还是html，还是图片
+                    w.writeHead(200, {'Content-Type': mimeTypes[ext]});
+                    w.end(await fs.readFile(`dist` + path));
+                    return;
+                }
+                if (intercepter) {
+                    let rsp = await intercepter(r, w)
+                    if (rsp) {
+                        return rsp
+                    }
+                }
+                let data = {}
+                if (r.method == "GET") {
+                    data = await getQuery(r.url)
+                } else {
+                    data = await getRequestBody(r)
+                }
+                let [a, clazz, fn] = path.split('/')
+                //console.log(rid,'req:',data)
+                let {obj, args} = createInstanceAndReq(clazz, data)
+                if (!obj[fn]) throw 'method not found'
+                let rsp = await obj[fn](...args, r)
+                if (typeof rsp == 'string' && rsp.startsWith('http')) {
+                    w.writeHead(302, {'Location': `${rsp}`});
+                    w.end();
+                    return
+                }
+                w.writeHead(200, {'Content-Type': 'application/json'});
+                w.end(JSON.stringify(rsp));
+            } catch (e) {
+                console.log('error:', e.message ? e.message : e);
+                console.log('stack:', e.stack);
+                w.writeHead(500, {'Content-Type': 'text/plain;charset=utf-8'});
+                w.end(e.message ? e.message : e);
             }
-            let path=url.parse(r.url).pathname
-            if (path=="/favicon.ico"){
-                w.writeHead(200); // 无内容响应
-                w.end(await fs.readFile('dist/favicon.ico'));
-                return;
-            }
-            if (path == '/') {//单页应用只能/访问
-                w.writeHead(200, {'Content-Type': 'text/html'});
-                // If the file is found, set Content-type and send data
-                w.end(await fs.readFile('dist/index.html'));
-                return;
-            }
-            //@ts-ignore 判断mime文件类型代表是静态资源，
-            let split = path.split('.')
-            let suffix = split[split.length - 1]
-            if (mimeTypes[suffix]) {
-                //判断mime type静态文件类型
-                let {parse}=await import('path')
-                const ext = parse(path).ext.replace(`.`,'');
-                //根据文件后缀类型返回对应格式的文件，如js，还是html，还是图片
-                w.writeHead(200, {'Content-Type': mimeTypes[ext]});
-                w.end(await fs.readFile(`dist` + path));
-                return;
-            }
-            if (intercepter){
-                let rsp=await intercepter(r,w)
-                if (rsp){return rsp}
-            }
-            let data={}
-            if (r.method=="GET"){
-                data=await getQuery(r.url)
-            }else {
-                data=await getRequestBody(r)
-            }
-            let [a, clazz, fn] = path.split('/')
-            //console.log(rid,'req:',data)
-            let {obj, args} = createInstanceAndReq(clazz, data)
-            if (!obj[fn])throw 'method not found'
-            let rsp = await obj[fn](...args,r)
-            if (typeof rsp =='string'&&rsp.startsWith('http')){
-                w.writeHead(302, { 'Location': `${rsp}`});
-                w.end();
-                return
-            }
-            w.writeHead(200, {'Content-Type': 'application/json'});
-            w.end(JSON.stringify(rsp));
-        }catch (e) {
-            console.log('error:', e.message?e.message:e);
-            console.log('stack:', e.stack);
-            w.writeHead(500, {'Content-Type': 'text/plain;charset=utf-8'});
-            w.end(e.message?e.message:e);
-        }
+        })
     });
     const port = conf.port;
     server.listen(port, () => {
