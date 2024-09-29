@@ -1,4 +1,4 @@
-import {classMap,createInstance,conf} from "./oapi";
+import {classMap,createInstance,conf,ctx} from "./oapi";
 // @ts-ignore
 import {reactive} from "vue"
 let Pool,pool: { connect: () => any; }
@@ -58,7 +58,7 @@ export class Base<T> {
             this.select.push(x)
         })
         this.gets=async function (where?:string|number){
-            const conn = await pool.connect(); // 从连接池获取一个客户端连接
+            const conn =await getconn() //有事务取事务,没事务创建连接对象
             try{
                 let parseMap = {}
                 where=isPureNumber(where)?`id=${where}`:where
@@ -67,7 +67,7 @@ export class Base<T> {
             }catch (e) {
                 throw e
             }finally {
-                conn.release(); // 释放客户端连接，返回连接池
+                release(conn); // 释放客户端连接，返回连接池
             }
         }
         Object.defineProperty(this, 'gets', {enumerable: false});
@@ -92,7 +92,7 @@ export class Base<T> {
         if (this.constructor.name=='Function'){
             o=new classMap[this.name.toLowerCase()]()
         }
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try{
             let parseMap = {}
             where=isPureNumber(where)?`id=${where}`:where
@@ -101,11 +101,11 @@ export class Base<T> {
         }catch (e) {
             throw e
         }finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
     }
     async gets(where?:string|number){
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try{
             let parseMap = {}
             where=isPureNumber(where)?`id=${where}`:where
@@ -114,12 +114,12 @@ export class Base<T> {
         }catch (e) {
             throw e
         }finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn)
         }
     }
 
     async getpage(page?,size?){
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try{
             let parseMap = {}
             this.where=getwhere(this)
@@ -130,7 +130,7 @@ export class Base<T> {
         }catch (e) {
             throw e
         }finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
     }
     static async get(where?:string|number){
@@ -138,7 +138,7 @@ export class Base<T> {
         if (this.constructor.name=='Function'){
             o=new classMap[this.name.toLowerCase()]()
         }
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try{
             let parseMap = {}
             where=isPureNumber(where)?`id=${where}`:where
@@ -147,11 +147,11 @@ export class Base<T> {
         }catch (e) {
             throw e
         }finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
     }
     async get(where?:string|number){
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try{
             let parseMap = {}
             where=isPureNumber(where)?`id=${where}`:where
@@ -160,7 +160,7 @@ export class Base<T> {
         }catch (e) {
             throw e
         }finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
     }
 
@@ -169,30 +169,34 @@ export class Base<T> {
         if (this.constructor.name=='Function'){
             o=createInstance(this.name.toLowerCase(),data)
         }
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
             await conn.query('BEGIN'); // 开始事务
             await add(null, null, o, conn)
             await conn.query('COMMIT'); // 提交事务
         } catch (err) {
-            await conn.query('ROLLBACK'); // 事务回滚
+            if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
+                await conn.query('ROLLBACK'); // 事务回滚
+            }
             throw err
         } finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
         return null
     }
     async add(){
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
             await conn.query('BEGIN'); // 开始事务
             await add(null, null, this, conn)
             await conn.query('COMMIT'); // 提交事务
         } catch (err) {
-            await conn.query('ROLLBACK'); // 事务回滚
+            if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
+                await conn.query('ROLLBACK'); // 事务回滚
+            }
             throw err
         } finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
         return null
     }
@@ -201,7 +205,7 @@ export class Base<T> {
         if (this.constructor.name=='Function'){
             o=createInstance(this.name.toLowerCase(),data)
         }
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
             where=isPureNumber(where)?`id=${where}`:where
             where=isEmptyObject(where)?'':where
@@ -209,15 +213,17 @@ export class Base<T> {
             await update(null, null, o, conn,where)
             await conn.query('COMMIT'); // 提交事务
         } catch (err) {
-            await conn.query('ROLLBACK'); // 事务回滚
+            if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
+                await conn.query('ROLLBACK'); // 事务回滚
+            }
             throw err
         } finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
         return null
     }
     async update(where?:string|number){
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
             where=isPureNumber(where)?`id=${where}`:where
             where=isEmptyObject(where)?'':where
@@ -225,10 +231,12 @@ export class Base<T> {
             await update(null, null, this, conn,where)
             await conn.query('COMMIT'); // 提交事务
         } catch (err) {
-            await conn.query('ROLLBACK'); // 事务回滚
+            if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
+                await conn.query('ROLLBACK'); // 事务回滚
+            }
             throw err
         } finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
         return null
     }
@@ -237,7 +245,7 @@ export class Base<T> {
         if (this.constructor.name=='Function'){
             o=new classMap[this.name.toLowerCase()]()
         }
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
             where=isPureNumber(where)?`id=${where}`:where
             where=isEmptyObject(where)?'':where
@@ -245,15 +253,17 @@ export class Base<T> {
             await del( o, conn,where)
             await conn.query('COMMIT'); // 提交事务
         } catch (err) {
-            await conn.query('ROLLBACK'); // 事务回滚
+            if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
+                await conn.query('ROLLBACK'); // 事务回滚
+            }
             throw err
         } finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
         return null
     }
     async del(where?:string|number){
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
             where=isPureNumber(where)?`id=${where}`:where
             where=isEmptyObject(where)?'':where
@@ -261,10 +271,12 @@ export class Base<T> {
             await del( this, conn,where)
             await conn.query('COMMIT'); // 提交事务
         } catch (err) {
-            await conn.query('ROLLBACK'); // 事务回滚
+            if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
+                await conn.query('ROLLBACK'); // 事务回滚
+            }
             throw err
         } finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
         return null
     }
@@ -275,56 +287,64 @@ export class Base<T> {
         }
         clazz=clazz.toLowerCase()
         where=where?`where ${where}`:''
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
             let rsp=await conn.query(`select count(*) from "${clazz}" ${where}`); // 提交事务
             return parseInt(rsp.rows[0].count)
         } catch (err) {
-            await conn.query('ROLLBACK'); // 事务回滚
+            if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
+                await conn.query('ROLLBACK'); // 事务回滚
+            }
             throw err
         } finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
         return null
     }
      async count(where?:string){
         let clazz=this.constructor.name.toLowerCase()
         where=where?`where ${where}`:''
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+         const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
             let rsp=await conn.query(`select count(*) from "${clazz}" ${where}`); // 提交事务
             return parseInt(rsp.rows[0].count)
         } catch (err) {
-            await conn.query('ROLLBACK'); // 事务回滚
+            if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
+                await conn.query('ROLLBACK'); // 事务回滚
+            }
             throw err
         } finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
         return null
     }
     static async query(sql:string){
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
             let rsp=await conn.query(sql); // 提交事务
             return rsp
         } catch (err) {
-            await conn.query('ROLLBACK'); // 事务回滚
+            if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
+                await conn.query('ROLLBACK'); // 事务回滚
+            }
             throw err
         } finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
         return null
     }
     async query(sql:string){
-        const conn = await pool.connect(); // 从连接池获取一个客户端连接
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
             let rsp=await conn.query(sql); // 提交事务
             return rsp
         } catch (err) {
-            await conn.query('ROLLBACK'); // 事务回滚
+            if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
+                await conn.query('ROLLBACK'); // 事务回滚
+            }
             throw err
         } finally {
-            conn.release(); // 释放客户端连接，返回连接池
+            release(conn); // 释放客户端连接，返回连接池
         }
         return null
     }
@@ -357,6 +377,26 @@ export function Constructor(target) {
             return Object.assign(new target(),args[0]);
         }
     });
+}
+export function Tx(target, name, descriptor) {
+    const originalMethod = descriptor.value;
+    descriptor.value =async function(...args) {
+        console.log(`Calling ${name} with args: ${args}`);
+        const conn =await getconn() //有事务取事务,没事务创建连接对象
+        ctx.getStore().tx=conn
+        try {
+            await conn.query('BEGIN'); // 开始事务
+            const result = originalMethod.apply(this, args);
+            await conn.query('COMMIT'); // 提交事务
+            return result;
+        } catch (err) {
+            await conn.query('ROLLBACK'); // 事务回滚
+            throw err
+        } finally {
+            conn.release() // 释放客户端连接，返回连接池
+        }
+    }
+    return descriptor;
 }
 export function Col(options) {
     return function (target, propertyKey) {
@@ -410,9 +450,8 @@ export function Menu(name:string) {
     };
 }
 
-export function log() {
-    return function () {
-    };
+export function log(msg) {
+    console.log(ctx.getStore().id,msg)
 }
 
 function nest(data, clazz) {
@@ -767,7 +806,7 @@ export async function migrateSql(sql:string) {
     } catch (err) {
         throw err
     } finally {
-        conn.release(); // 释放客户端连接，返回连接池
+        conn.release() // 释放客户端连接，返回连接池
     }
 }
 function isEmptyObject(obj) {
@@ -875,4 +914,12 @@ export function set(obj, data) {
         }
     })
     return obj;
+}
+async function getconn() {
+    return ctx.getStore().tx||await pool.connect()
+}
+async function release(conn) {
+    if (!ctx.getStore().tx){//无事务立马释放，有事务@Tx处理释放
+        conn.release()
+    }
 }

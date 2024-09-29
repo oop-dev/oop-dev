@@ -13,7 +13,7 @@ const mimeTypes = {
     'ttf': 'application/font-sfnt',
     'ico': 'favicon.ico'
 }
-let fs, migrateSql ,Base ,migrate ,config ,path;
+let fs, migrateSql ,Base ,migrate ,config ,path,asyncLocalStorage;
 
 if (typeof window=='undefined'){
     path='./'  // 同步./是根目录，异步是当前目录
@@ -22,10 +22,14 @@ if (typeof window=='undefined'){
     migrateSql = require('./Base.ts').migrateSql;
     Base = require('./Base.ts').Base.ts;
     migrate= require('./migrate').migrate;
+    asyncLocalStorage= new (require('async_hooks').AsyncLocalStorage)();
 }
 export const conf=config
 export const classMap = {}
-
+export const ctx = asyncLocalStorage
+export const log = (msg)=>{
+    console.log('请求id:',ctx.getStore().rid,'msg:',msg)
+}
 export async function run(intercepter) {
     if (!conf.pg) {
         let name = UUID()
@@ -46,11 +50,14 @@ export async function run(intercepter) {
     await loadClass()
     //migrate page and table
     migrate(classMap)
-    if (conf.runtime=='bun'){
-        bun_run(intercepter)
-    }else {
-        node_run()
-    }
+
+    asyncLocalStorage.run({rid:UUID()}, async () => {
+        if (conf.runtime=='bun'){
+            bun_run(intercepter)
+        }else {
+            node_run()
+        }
+    })
 }
 
 export function Rsp(code, data, rid='') {
