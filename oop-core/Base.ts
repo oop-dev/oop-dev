@@ -1,4 +1,4 @@
-import {classMap,createInstance,conf,ctx} from "./oapi";
+import {classMap, createInstance, conf, ctx, log} from "./oapi";
 // @ts-ignore
 import {reactive} from "vue"
 let Pool,pool: { connect: () => any; }
@@ -353,7 +353,7 @@ export class Base<T> {
     }
     err(msg) {
         return (e)=> {
-            console.error( JSON.stringify(this),msg,e.stack); // 打印错误日志
+            log(`${msg},${e.stack}`)
             throw msg; // 返回动态的错误处理信息
         };
     }
@@ -365,6 +365,12 @@ export class Base<T> {
         // @ts-ignore
         return this.constructor.metadata[k]
     }
+}
+export function err(msg) {
+    return (e)=> {
+        log(`${msg},${e.stack}`)
+        throw msg; // 返回动态的错误处理信息
+    };
 }
 export function Constructor(target) {
     return new Proxy(target, {
@@ -381,12 +387,11 @@ export function Constructor(target) {
 export function Tx(target, name, descriptor) {
     const originalMethod = descriptor.value;
     descriptor.value =async function(...args) {
-        console.log(`Calling ${name} with args: ${args}`);
-        const conn =await getconn() //有事务取事务,没事务创建连接对象
+        const conn =await pool.connect() //有事务取事务,没事务创建连接对象
         ctx.getStore().tx=conn
         try {
             await conn.query('BEGIN'); // 开始事务
-            const result = originalMethod.apply(this, args);
+            const result =await originalMethod.apply(this, args);
             await conn.query('COMMIT'); // 提交事务
             return result;
         } catch (err) {
@@ -450,9 +455,7 @@ export function Menu(name:string) {
     };
 }
 
-export function log(msg) {
-    console.log(ctx.getStore().id,msg)
-}
+
 
 function nest(data, clazz) {
     const m = {};
