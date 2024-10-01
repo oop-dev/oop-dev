@@ -676,8 +676,9 @@ function getobjSql(u, parseMap) {
     return sql
 }
 
+//
 async function add(pname, pid, u, conn) {
-    if (u.id){
+    if (u.id||u.where){
         update(pname, pid, u,conn)
         return
     }
@@ -732,9 +733,12 @@ async function add(pname, pid, u, conn) {
     ));
 }
 
+//修改不支持动态where，只有静态where和id是条件
 async function update(pname, pid, u,conn,where?) {
     if (typeof u!='object')return
-    if (!u.id){
+    where = u.where||where
+    where = where ?'where '+where:`where id=${u.id}`
+    if (!where){
         add(pname, pid, u,conn)
         return
     }
@@ -757,15 +761,6 @@ async function update(pname, pid, u,conn,where?) {
     }).map(([k, v]) => {
         return `"${k}"='${v}'`
     })
-    /*    let where = Object.entries(u).filter(([key, value]) => value && !Array.isArray(value)).map(([k, v]) => {
-            if (typeof v != 'object') {
-                return `${clazz}.${k}='${v}'`
-            } else {
-                return getwhere(v)
-            }
-        }).flat().join(' and ')*/
-    where = u.where||where
-    where = where ?'where '+where:`where id=${u.id}`
     //执行sql获取id
     let sql=`update "${clazz}" set ${values} ${where}`
     let result = await conn.query(sql)
