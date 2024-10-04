@@ -73,11 +73,25 @@ export class Base<T> {
         Object.defineProperty(this, 'gets', {enumerable: false});
         return this
     }
-    wh(where:string|number|undefined):this {
+    wh(where,...values):this {
         // 只允许传入当前类的有效属性名
-        where=isPureNumber(where)?`id=${where}`:where
-        // @ts-ignore
-        this.where=isEmptyObject(where)?'':where
+        if (!ctx.getStore()?.query){
+            ctx.getStore().query={index:0,values:[]}
+        }
+        this.where=getArgOn(where,values)
+        this.gets=async function (where?, ...values){
+            console.log(where,values)
+            const conn =await getconn() //有事务取事务,没事务创建连接对象
+            try{//支持id，拼接，和参数化三种方式
+                let parseMap = {}
+                return await gets(this, conn, parseMap,getArgwhere(where,values))
+            }catch (e) {
+                throw e
+            }finally {
+                release(conn)
+            }
+        }
+        Object.defineProperty(this, 'gets', {enumerable: false});
         return this
     }
     page(page:bigint,size:bigint):this{
@@ -87,7 +101,7 @@ export class Base<T> {
         return this
     }
     //增删改查方法被代理，
-    static async gets(where?:string){
+    static async gets(where?:string,...values){
         let o=this
         if (this.constructor.name=='Function'){
             o=new classMap[this.name.toLowerCase()]()
@@ -95,22 +109,19 @@ export class Base<T> {
         const conn =await getconn() //有事务取事务,没事务创建连接对象
         try{
             let parseMap = {}
-            where=isPureNumber(where)?`id=${where}`:where
-            where=isEmptyObject(where)?'':where
-            return await gets(o, conn, parseMap,where)
+            return await gets(o, conn, parseMap,getArgwhere(where,values))
         }catch (e) {
             throw e
         }finally {
             release(conn); // 释放客户端连接，返回连接池
         }
     }
-    async gets(where?:string|number){
+    async gets(where?, ...values){
+        console.log(where,values)
         const conn =await getconn() //有事务取事务,没事务创建连接对象
-        try{
+        try{//支持id，拼接，和参数化三种方式
             let parseMap = {}
-            where=isPureNumber(where)?`id=${where}`:where
-            where=isEmptyObject(where)?'':where
-            return await gets(this, conn, parseMap,where)
+            return await gets(this, conn, parseMap,getArgwhere(where,values))
         }catch (e) {
             throw e
         }finally {
@@ -133,7 +144,7 @@ export class Base<T> {
             release(conn); // 释放客户端连接，返回连接池
         }
     }
-    static async get(where?:string|number){
+    static async get(where?:string|number,...values){
         let o=this
         if (this.constructor.name=='Function'){
             o=new classMap[this.name.toLowerCase()]()
@@ -141,22 +152,20 @@ export class Base<T> {
         const conn =await getconn() //有事务取事务,没事务创建连接对象
         try{
             let parseMap = {}
-            where=isPureNumber(where)?`id=${where}`:where
-            where=isEmptyObject(where)?'':where
-            return await get(o, conn, parseMap,where)
+            return await get(o, conn, parseMap,getArgwhere(where,values))
         }catch (e) {
             throw e
         }finally {
             release(conn); // 释放客户端连接，返回连接池
         }
     }
-    async get(where?:string|number){
+    async get(where?:string|number,...values){
         const conn =await getconn() //有事务取事务,没事务创建连接对象
         try{
             let parseMap = {}
             where=isPureNumber(where)?`id=${where}`:where
             where=isEmptyObject(where)?'':where
-            return await get(this, conn, parseMap,where)
+            return await get(this, conn, parseMap,getArgwhere(where,values))
         }catch (e) {
             throw e
         }finally {
@@ -222,13 +231,16 @@ export class Base<T> {
         }
         return null
     }
-    async update(where?:string|number){
+    async update(where?,...values){
         const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
-            where=isPureNumber(where)?`id=${where}`:where
-            where=isEmptyObject(where)?'':where
             await conn.query('BEGIN'); // 开始事务
-            await update(null, null, this, conn,where)
+            where=getArgwhere(where,values)
+            if (!where){//没条件通过id查询，不能通过动态查询
+                where=query`id=${where}`
+                where.text=`where ${where.text}`
+            }
+            await update(null, null, this, conn,getArgwhere(where,values))
             await conn.query('COMMIT'); // 提交事务
         } catch (err) {
             if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
@@ -262,13 +274,11 @@ export class Base<T> {
         }
         return null
     }
-    async del(where?:string|number){
+    async del(where?,...values){
         const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
-            where=isPureNumber(where)?`id=${where}`:where
-            where=isEmptyObject(where)?'':where
             await conn.query('BEGIN'); // 开始事务
-            await del( this, conn,where)
+            await del( this, conn,getArgwhere(where,values))
             await conn.query('COMMIT'); // 提交事务
         } catch (err) {
             if (!ctx.getStore().tx){//无事务立马回滚，有事务@Tx处理回滚
@@ -516,7 +526,7 @@ async function gets(u, conn, parseMap,where?) {
             return getwhere(v)
         }
     }).filter(item => item !== undefined).flat().join(' and ')
-    where=where&&!startsWithOrderByOrLimit(u.where)?`where ${where}`:where
+    //where=where&&!startsWithOrderByOrLimit(u.where)?`where ${where}`:where
     if (!u.select||u?.select?.length==0){u.select=['*']}
     let sel = Object.entries(u).filter(([k, v]) =>u.select&&!base[k]&& !parseMap[k]).map(([k, v]) => {
         if (typeof v != 'object'&&(u.select.includes(k)|u.select.includes('*'))) {
@@ -530,7 +540,8 @@ async function gets(u, conn, parseMap,where?) {
         let son = k
         let rootjoin=''
         // @ts-ignore
-        let on=v.where? `on ${v.where}` : ''
+        let on=v.where.text||v.where
+        on=on?`and ${on}`:''
         if (u.col(k)?.link == 'n1'){
             rootjoin=`left join ${k} on "${clazz}".${k} = ${k}.id ${on}`
         }else if (u.col(k)?.link == 'nn'){
@@ -543,15 +554,17 @@ async function gets(u, conn, parseMap,where?) {
 
     let main=''
     if (join){//修改，两个where要同时判断，不是二选一
-        let where_main=u.where&&!u.where.trim().startsWith('offset')?`where ${u.where}`:where+u.where
+        let where_main=u.where.text||u.where
+         where_main=where_main&&!where_main.trim().startsWith('offset')?`where ${where_main}`:where+where_main
         main=`(select * from "${clazz}" ${where_main}) as "${clazz}"`
     }else if (u.where) {
-        where=u.where&&!startsWithOrderByOrLimit(u.where)?`where ${u.where}`:u.where
+        //where=u.where&&!startsWithOrderByOrLimit(u.where)?`where ${u.where}`:u.where
     }
     main=main||`"${clazz}"`
-    let sql = `select ${sel} from ${main} ${join} ${where}`
-    console.log('sql',sql)
-    let rs = await conn.query(sql)
+    let sql = `select ${sel} from ${main} ${join} ${where.text||where}`
+    console.log('sql',sql,'values',ctx.getStore().query?.values||where.values)
+    let rs = await conn.query(sql,ctx.getStore().query?.values||where.values)
+    ctx.getStore().query=null
     return nest(rs.rows, clazz)
 }
 function startsWithOrderByOrLimit(str) {
@@ -703,9 +716,9 @@ async function add(pname, pid, u, conn) {
         return !base[k]&&typeof v != 'object' && k != 'id'
     }).map(([k, v]) => {
         if (Array.isArray(v)){
-            return `'{${v}}'`
+            return `{${v}}`
         }
-        return `'${v}'` || 'null'
+        return `${v}` || 'null'
     })
     let keys = Object.entries(u).filter(([k, v]) => {
         if (base[k]){
@@ -721,23 +734,28 @@ async function add(pname, pid, u, conn) {
     }).map(([k, v]) => {
         return k || 'null'
     })
+    //参数化查询防止sql注入
+    let placeholders=keys.map((_,i)=>`$${i+1}`)
     //执行sql获取id
-    let sql=`insert into "${clazz}" (${keys})values (${values}) RETURNING id`
-    console.log(sql)
-    let result = await conn.query(sql)
+    //判断正向还是反向，1对1、
+    console.log(u)
+    let sql=`insert into "${clazz}" (${keys})values (${placeholders}) RETURNING id`
+    console.log(sql,values)
+    let result = await conn.query(sql,values)
     let parentId = result.rows[0].id
     await Promise.all(sub.map(v =>
         Array.isArray(v)
             ? Promise.all(v.map(item => add(clazz, parentId, item, conn)))
             : add(clazz, parentId, v, conn)
     ));
+    return parentId
 }
 
 //修改不支持动态where，只有静态where和id是条件
 async function update(pname, pid, u,conn,where?) {
     if (typeof u!='object')return
     where = u.where||where
-    where = where ?'where '+where:`where id=${u.id}`
+    //where = where ?'where '+where:`where id=${u.id}`
     if (!where){
         add(pname, pid, u,conn)
         return
@@ -762,8 +780,9 @@ async function update(pname, pid, u,conn,where?) {
         return `"${k}"='${v}'`
     })
     //执行sql获取id
-    let sql=`update "${clazz}" set ${values} ${where}`
-    let result = await conn.query(sql)
+    let sql=`update "${clazz}" set ${values} ${where.text||where}`
+    console.log(sql,where)
+    let result = await conn.query(sql,where.values)
     let parentId = Math.random()
     // @ts-ignore
     sub.forEach(v => Array.isArray(v) ? v.forEach(v => update(clazz, parentId, v)) : update(clazz, parentId, v))
@@ -791,10 +810,10 @@ async function del(u,conn,where?) {
         }
     }).filter(item => item !== undefined).flat().join(' and ')
     where = where || u.where
-    where = where ? `where ${where}` : ''
 
-    let sql = `delete from "${clazz}" ${where}`
-    let result = await conn.query(sql)
+    let sql = `delete from "${clazz}" ${where.text||where}`
+    console.log(sql,where.values)
+    let result = await conn.query(sql,where.values)
     return result
 }
 export async function migrateSql(sql:string) {
@@ -920,4 +939,47 @@ async function release(conn) {
     if (!ctx.getStore().tx){//无事务立马释放，有事务@Tx处理释放
         conn.release()
     }
+}
+function query(text, ...values) {
+    // 生成 参数化查询对象
+    text = text.reduce((prev, current, i) => {
+        if (i == text.length - 1) {
+            return `${prev}${current}`; //最后括号不处理
+        }
+        if (ctx.getStore()?.query){
+            ctx.getStore().query.values.push(...values)
+            return `${prev}${current}$${++ ctx.getStore().query.index}`; // 使用 $1, $2 等参数化占位符
+        }else {
+            return `${prev}${current}$${i}`; // 使用 $1, $2 等参数化占位符
+        }
+    }, '');
+    return {text, values}
+}
+function getArgwhere(where,values) {
+    if (Array.isArray(where)){
+        where=query(where,...values)
+        where.text=`where ${where.text}`
+        console.log(where)
+    }else if (isPureNumber(where)) {
+        where=query`id=${where}`
+        where.text=`where ${where.text}`
+        console.log(where)
+    }else {
+        where=isEmptyObject(where)?'':'where '+where
+    }
+    return where
+}
+function getArgOn(where,values) {
+    if (Array.isArray(where)){
+        where=query(where,...values)
+        where.text=`${where.text}`
+        console.log(where)
+    }else if (isPureNumber(where)) {
+        where=query`id=${where}`
+        where.text=`${where.text}`
+        console.log(where)
+    }else {
+        where=isEmptyObject(where)?'':'and '+where
+    }
+    return where
 }
