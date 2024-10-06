@@ -526,6 +526,10 @@ async function gets(u, conn, parseMap,where?) {
             return getwhere(v)
         }
     }).filter(item => item !== undefined).flat().join(' and ')
+    //暂时补丁
+    if (typeof where=="string"&&where){
+        where=' where '+where
+    }
     //where=where&&!startsWithOrderByOrLimit(u.where)?`where ${where}`:where
     if (!u.select||u?.select?.length==0){u.select=['*']}
     let sel = Object.entries(u).filter(([k, v]) =>u.select&&!base[k]&& !parseMap[k]).map(([k, v]) => {
