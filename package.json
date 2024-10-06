@@ -8,7 +8,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "end": "tsx index.ts",
+    "end": "tsx watch index.ts",
     "frond": "vite"
   },
   "dependencies": {

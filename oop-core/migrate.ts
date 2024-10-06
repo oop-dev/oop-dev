@@ -1,8 +1,10 @@
 import {classMap,conf} from "./oapi";
 import {Base} from "./Base";
 import {migrateSql} from "./Base";
-let fs = require('node:fs')
-
+let fs = null
+if (typeof window=='undefined'){
+    fs = require('node:fs')
+}
 let base={list:true,on:true,select:true,where:true}
 let parseMap={}
 export function migrate(classMap) {
