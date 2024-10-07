@@ -11,6 +11,10 @@ export default defineConfig({
     vue(),
     vueJsx(),
   ],
+  server: {
+    host: '0.0.0.0',
+    port: 5174 // 指定端口为3000
+  },
   resolve: {
     alias: {
       // @ts-ignore
