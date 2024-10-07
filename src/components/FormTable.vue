@@ -8,24 +8,33 @@ function upper(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 onMounted(async ()=>{
+  delete cols['id']
   console.log(111111,prop.clazz)
   let m=await import(`../../api/${upper(prop.clazz)}`)
   let o= new m[`${upper(prop.clazz)}`]()
   cols.value=o.cols()
+  delete cols.value['id']
   console.log('o',o.cols())
 })
-delete cols['id']
-console.log(cols)
 </script>
 <template>
   <el-table :data="list.filter(x=>!x.delete)" style="width: 100%">
     <el-table-column
-        v-for="item in cols"
-        :label="item.tag"
-        :prop="item.col"
+        v-for="{ col, tag, sel, radio, check,show } in cols"
+        :label="tag"
+        :prop="col"
     >
       <template #default="scope">
-        <el-input v-if="!scope.row['delete']" v-model="scope.row[item.col]" placeholder="请输入" />
+        <el-select v-if="sel" v-model="scope.row[col]" :placeholder="tag">
+          <el-option
+              v-for="(item, index) in sel"
+              :key="index"
+              :label="item"
+              :value="index"
+          />
+        </el-select>
+        <el-input v-else v-model="scope.row[col]" placeholder="请输入" />
+<!--        <el-input v-if="!scope.row['delete']" v-model="scope.row[col]" placeholder="请输入" />-->
       </template>
     </el-table-column>
     <el-table-column align="right">

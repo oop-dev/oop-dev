@@ -1,3 +1,4 @@
+// @ts-ignore
 import {createRouter, createWebHistory, type Router} from 'vue-router'
 import Login from "../views/login.vue";
 import Home from "../views/home.vue";

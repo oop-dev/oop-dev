@@ -234,12 +234,11 @@ export class Base<T> {
     async update(where?,...values){
         const conn =await getconn() //有事务取事务,没事务创建连接对象
         try {
-            await conn.query('BEGIN'); // 开始事务
-            where=getArgwhere(where,values)
             if (!where){//没条件通过id查询，不能通过动态查询
                 where=query`id=${where}`
                 where.text=`where ${where.text}`
             }
+            await conn.query('BEGIN'); // 开始事务
             await update(null, null, this, conn,getArgwhere(where,values))
             await conn.query('COMMIT'); // 提交事务
         } catch (err) {
@@ -519,17 +518,15 @@ async function get(u, conn, parseMap,where?) {
 async function gets(u, conn, parseMap,where?) {
     let clazz = u.constructor.name.toLowerCase()
     parseMap[clazz] = true
-    where=where|| Object.entries(u).filter(([key, value]) =>!base[key]&&value && typeof value!='object').map(([k, v]) => {
+    let dwhere=Object.entries(u).filter(([key, value]) =>!base[key]&&value && typeof value!='object').map(([k, v]) => {
         if (typeof v != 'object') {
             return `"${clazz}".${k}='${v}'`
         } else if (u.select.includes(k)){
             return getwhere(v)
         }
     }).filter(item => item !== undefined).flat().join(' and ')
-    //暂时补丁
-    if (typeof where=="string"&&where){
-        where=' where '+where
-    }
+    if (dwhere){dwhere=' where '+dwhere}
+    where=where|| dwhere
     //where=where&&!startsWithOrderByOrLimit(u.where)?`where ${where}`:where
     if (!u.select||u?.select?.length==0){u.select=['*']}
     let sel = Object.entries(u).filter(([k, v]) =>u.select&&!base[k]&& !parseMap[k]).map(([k, v]) => {
@@ -759,7 +756,8 @@ async function add(pname, pid, u, conn) {
 async function update(pname, pid, u,conn,where?) {
     if (typeof u!='object')return
     where = u.where||where
-    //where = where ?'where '+where:`where id=${u.id}`
+    console.log('update',JSON.stringify(where))
+    where = where||`where id=${u.id}`
     if (!where){
         add(pname, pid, u,conn)
         return
@@ -954,7 +952,7 @@ function query(text, ...values) {
             ctx.getStore().query.values.push(...values)
             return `${prev}${current}$${++ ctx.getStore().query.index}`; // 使用 $1, $2 等参数化占位符
         }else {
-            return `${prev}${current}$${i}`; // 使用 $1, $2 等参数化占位符
+            return `${prev}${current}$${i+1}`; // 使用 $1, $2 等参数化占位符
         }
     }, '');
     return {text, values}
