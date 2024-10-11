@@ -5,5 +5,9 @@ export class Manager extends Base<Manager> {
     name=''
     @Col({tag:'提成费率',show:'1111',link:'sstr'})
     rate=0
+    async gets() {
+        console.log('cols',this.cols())
+        return await super.gets()
+    }
 }
 

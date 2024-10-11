@@ -44,10 +44,27 @@ function gen(u:Base<any>,pname,tp) {
     parseMap[clazz]=true
     let body=[]
 
+
+
     body=Object.entries(u).filter(([k, v]) =>{
         if (base[k]){return false}
+        //n1判断，是对象，且对象的我是数组，代表n1
+        if (!Array.isArray(v)&&typeof v=='object'){
+            if (Array.isArray(v[clazz])){
+                console.log('clazz',clazz,k,classMap[clazz].prototype.constructor.metadata[k])
+                classMap[clazz].prototype.constructor.metadata[k].link='n1'
+                console.log('clazz',classMap[clazz].prototype.constructor.metadata[k])
+            }
+        }
+        //nn判断，是数组，且对象的我是数组，代表nn
+        if (Array.isArray(v)){
+            if (Array.isArray(new classMap[k]()[clazz])){
+                classMap[clazz].prototype.constructor.metadata[k].link='nn'
+                console.log('clazz',classMap[clazz].prototype.constructor.metadata[k])
+            }
+        }
         if (typeof v=='object'&&!['n1','nn'].includes(u.col(k)?.link)){
-            gen(new classMap[k](),clazz,1)
+            gen(v,clazz,1)
             return false
         }
         return true
