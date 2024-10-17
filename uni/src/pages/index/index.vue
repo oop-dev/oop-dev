@@ -1,17 +1,60 @@
 <template>
-  <up-swiper
-      :list="list1"
-      @change="change"
-      @click="click"
-  ></up-swiper>
+  <view class="u-page">
+    <up-list
+        @scrolltolower="scrolltolower"
+    >
+      <up-list-item
+          v-for="(item, index) in indexList"
+          :key="index"
+      >
+        <up-cell
+            :title="`列表长度-${index + 1}`"
+        >
+          <template #icon>
+            <up-avatar
+                shape="square"
+                size="35"
+                :src="item.url"
+                customStyle="margin: -3px 5px -3px 0"
+            ></up-avatar>
+          </template>
+        </up-cell>
+      </up-list-item>
+    </up-list>
+  </view>
 </template>
-<script setup>
-import { reactive } from 'vue';
 
-// 使用 reactive 创建响应式数组
-const list1 = reactive([
-  'https://cdn.uviewui.com/uview/swiper/swiper1.png',
-  'https://cdn.uviewui.com/uview/swiper/swiper2.png',
-  'https://cdn.uviewui.com/uview/swiper/swiper3.png',
-]);
+<script setup>
+import { ref, reactive } from 'vue';
+import { onLoad, onShow } from '@dcloudio/uni-app';
+
+const indexList = reactive([]);
+const urls = [
+  'https://uview-plus.jiangruyi.com/album/1.jpg',
+  'https://uview-plus.jiangruyi.com/album/2.jpg',
+  'https://uview-plus.jiangruyi.com/album/3.jpg',
+  'https://uview-plus.jiangruyi.com/album/4.jpg',
+  'https://uview-plus.jiangruyi.com/album/5.jpg',
+  'https://uview-plus.jiangruyi.com/album/6.jpg',
+  'https://uview-plus.jiangruyi.com/album/7.jpg',
+  'https://uview-plus.jiangruyi.com/album/8.jpg',
+  'https://uview-plus.jiangruyi.com/album/9.jpg',
+  'https://uview-plus.jiangruyi.com/album/10.jpg',
+];
+
+onLoad(() => {
+  loadmore();
+});
+
+const scrolltolower = () => {
+  loadmore();
+};
+
+const loadmore = () => {
+  for (let i = 0; i < 30; i++) {
+    indexList.push({
+      url: urls[uni.$u.random(0, urls.length - 1)],
+    });
+  }
+};
 </script>
