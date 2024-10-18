@@ -20,9 +20,17 @@ export class Base<T> {
     where: string | undefined =''
     constructor(opts?:(Partial<Record<keyof T, any>>|number)) {
         if (typeof opts=="number")this.id=opts
-        if (typeof window !== 'undefined') {
+        if (typeof process=='undefined') {
             let obj=reactive(this)
-            wrapMethods(obj)
+            // @ts-ignore
+            if (typeof uni !== 'undefined') {
+                console.log('uni')
+                wrapUniMethods(obj)
+            } else {
+                // 当前是Vue环境
+                console.log('vue')
+                wrapMethods(obj)
+            }
             // @ts-ignore
             return obj
         }
@@ -833,6 +841,52 @@ function isEmptyObject(obj) {
     return Object.keys(obj).length === 0;
 }
 function wrapMethods(obj) {
+    // 浏览器环境，增强方法并替换为新的逻辑
+    let list=Object.getOwnPropertyNames(Object.getPrototypeOf(obj))
+    let base_list=Object.getOwnPropertyNames(Object.getPrototypeOf(obj.constructor.prototype))
+    const mergedSet = new Set([...list, ...base_list]);
+    // @ts-ignore
+    for (let key of mergedSet) {
+        if (typeof obj[key] === 'function' &&!['constructor','cols','cols'].includes(key )) {
+            // 替换方法
+            let className = obj.constructor.name.toLowerCase().replaceAll('_','')
+            obj[key] =async function (...args) {
+                // 你可以在这里添加新的逻辑，而不是调用原来的方法
+                let {list,total,...data}=obj
+                // @ts-ignore
+                let rsp= await post(className + '/' + key, [data,...args])
+                if (Array.isArray(rsp)){
+                    if (rsp){
+                        obj.list=rsp
+                    }
+                }else if (rsp&&typeof rsp=='object') {
+                    Object.keys(obj).forEach(k=>{
+                        if (rsp[k]){
+                            obj[k]=rsp[k]
+                        }
+                    })
+                }
+                if (rsp?.list){
+                    obj.list=rsp?.list
+                }
+                if (rsp?.total){
+                    obj.total=rsp?.total
+                }
+                if (['add','update'].includes(key)){
+                    // @ts-ignore
+                    //import('@/router/index').then((m=>m.to('gets')))
+                    window.history.go(-1);
+                }else if (key=='del'){
+                    // @ts-ignore
+                    let rsp= await post(className + '/gets', data)
+                    obj.list=Array.isArray(rsp)?rsp:rsp?.list
+                }
+                return rsp
+            }
+        }
+    }
+}
+function wrapUniMethods(obj) {
         // 浏览器环境，增强方法并替换为新的逻辑
     let list=Object.getOwnPropertyNames(Object.getPrototypeOf(obj))
     let base_list=Object.getOwnPropertyNames(Object.getPrototypeOf(obj.constructor.prototype))
@@ -846,7 +900,7 @@ function wrapMethods(obj) {
                     // 你可以在这里添加新的逻辑，而不是调用原来的方法
                     let {list,total,...data}=obj
                     // @ts-ignore
-                    let rsp= await post(className + '/' + key, [data,...args])
+                    let rsp= await uniPost(className + '/' + key, [data,...args])
                     if (Array.isArray(rsp)){
                         if (rsp){
                             obj.list=rsp
@@ -866,7 +920,8 @@ function wrapMethods(obj) {
                     }
                     if (['add','update'].includes(key)){
                         // @ts-ignore
-                        import('@/router/index').then((m=>m.to('gets')))
+                        //import('@/router/index').then((m=>m.to('gets')))
+                        window.history.go(-1);
                     }else if (key=='del'){
                         // @ts-ignore
                         let rsp= await post(className + '/gets', data)
@@ -876,6 +931,25 @@ function wrapMethods(obj) {
                 }
             }
         }
+}
+
+export async function uniPost(url, data,header) {
+    try {
+        // @ts-ignore
+        const requestUrl =import.meta.env.VITE_BASE_URL+'/' + url;
+        const response = await uni.request({
+            url: requestUrl,
+            method: 'POST',
+            data: data,
+            header: header
+        });
+        // 请求成功处理逻辑
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        // 请求失败处理逻辑
+        console.error(error);
+    }
 }
 export const post = async (url, data, header) => {
     try {

@@ -15,7 +15,7 @@ const mimeTypes = {
 }
 let fs, migrateSql ,Base ,migrate ,config ,path,asyncLocalStorage;
 
-if (typeof window=='undefined'){
+if (typeof process!='undefined'){
     path='./'  // 同步./是根目录，异步是当前目录
     fs = require('node:fs/promises');
     config = toml(path);
