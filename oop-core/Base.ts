@@ -20,7 +20,7 @@ export class Base<T> {
     where: string | undefined =''
     constructor(opts?:(Partial<Record<keyof T, any>>|number)) {
         if (typeof opts=="number")this.id=opts
-        if (typeof process=='undefined') {
+        if (!(typeof process !== 'undefined' && process.versions && process.versions.node)) {//不是后端
             let obj=reactive(this)
             // @ts-ignore
             if (typeof uni !== 'undefined') {
