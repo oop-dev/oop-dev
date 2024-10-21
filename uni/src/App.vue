@@ -10,9 +10,11 @@ onHide(() => {
   console.log("App Hide");
 });
 </script>
-<style lang="postcss">
-@uview-plus index.scss
-@tailwind base
-@tailwind components
-@tailwind utilities
+<style>
+/* @import '~tailwindcss/base';
+@import '~tailwindcss/components';
+@import '~tailwindcss/utilities'; */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 </style>
