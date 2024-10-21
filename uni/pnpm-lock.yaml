@@ -53,6 +53,9 @@ importers:
       '@dcloudio/uni-quickapp-webview':
         specifier: 3.0.0-4020920240930001
         version: 3.0.0-4020920240930001(postcss@8.4.47)(rollup@4.24.0)(vue@3.5.12(typescript@4.9.5))(webpack-sources@3.2.3)
+      '@vue/shared':
+        specifier: 3.4.21
+        version: 3.4.21
       clipboard:
         specifier: ^2.0.11
         version: 2.0.11
@@ -60,14 +63,14 @@ importers:
         specifier: ^3.3.36
         version: 3.3.36
       vue:
-        specifier: ^3.4.21
+        specifier: ^3.5.12
         version: 3.5.12(typescript@4.9.5)
       vue-i18n:
-        specifier: ^9.1.9
+        specifier: ^9.14.1
         version: 9.14.1(vue@3.5.12(typescript@4.9.5))
     devDependencies:
       '@dcloudio/types':
-        specifier: ^3.4.8
+        specifier: ^3.4.12
         version: 3.4.12
       '@dcloudio/uni-automator':
         specifier: 3.0.0-4020920240930001
@@ -82,7 +85,7 @@ importers:
         specifier: 3.0.0-4020920240930001
         version: 3.0.0-4020920240930001(postcss@8.4.47)(rollup@4.24.0)(vite@5.2.8(@types/node@22.7.5)(sass@1.32.13)(terser@5.34.1))(vue@3.5.12(typescript@4.9.5))(webpack-sources@3.2.3)
       '@vue/runtime-core':
-        specifier: ^3.4.21
+        specifier: ^3.5.12
         version: 3.5.12
       '@vue/tsconfig':
         specifier: ^0.1.3
